@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { AndroidTopBar } from '../components/AndroidTopBar';
+import { AndroidBottomNavigation, AndroidTab } from '../components/AndroidBottomNavigation';
 import { WorkspaceSidebar } from '../components/WorkspaceSidebar';
 import { TaskCard } from '../components/TaskCard';
 import { TaskDetailModal } from '../components/TaskDetailModal';
@@ -14,9 +16,6 @@ import {
 import { 
   Plus, 
   Search, 
-  Filter, 
-  Users, 
-  Sparkles, 
   CheckCircle2, 
   Clock, 
   AlertCircle,
@@ -50,7 +49,107 @@ const Index = () => {
 
   const [isSimulating, setIsSimulating] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedPriority, setSelectedPriority] = useState<string>('all');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  
+  // Android Navigation State
+  const [activeTab, setActiveTab] = useState<AndroidTab>('board');
+  const [activeColumn, setActiveColumn] = useState<TaskStatus>('todo');
+  
+  // Modals
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [isNewTaskOpen, setIsNewTaskOpen] = useState(false);
+
+  // Save to localStorage
+  useEffect(() => {
+    localStorage.setItem('cotask_workspaces', JSON.stringify(workspaces));
+  }, [workspaces]);
+
+  useEffect(() => {
+    localStorage.setItem('cotask_tasks', JSON.stringify(tasks));
+  }, [tasks]);
+
+  useEffect(() => {
+    localStorage.setItem('cotask_activities', JSON.stringify(activities));
+  }, [activities]);
+
+  // Live Simulation Effect
+  useEffect(() => {
+    if (!isSimulating) return;
+
+    const interval = setInterval(() => {
+      // Pick a random user other than current user
+      const otherUsers = users.filter(u => u.id !== currentUser.id);
+      if (otherUsers.length === 0) return;
+      const randomUser = otherUsers[Math.floor(Math.random() * otherUsers.length)];
+
+      // Pick a random task in the active workspace
+      const workspaceTasks = tasks.filter(t => t.workspaceId === activeWorkspace.id);
+      if (workspaceTasks.length === 0) return;
+      const randomTask = workspaceTasks[Math.floor(Math.random() * workspaceTasks.length)];
+
+      // Decide on a random action
+      const actions = ['move', 'comment', 'subtask'];
+      const randomAction = actions[Math.floor(Math.random() * actions.length)];
+
+      if (randomAction === 'move') {
+        const statuses: TaskStatus[] =<dyad-write path="src/pages/Index.tsx" description="Completing the main Index page to coordinate the Android App Shell, bottom navigation, top app bar, and FAB">
+import React, { useState, useEffect } from 'react';
+import { AndroidTopBar } from '../components/AndroidTopBar';
+import { AndroidBottomNavigation, AndroidTab } from '../components/AndroidBottomNavigation';
+import { WorkspaceSidebar } from '../components/WorkspaceSidebar';
+import { TaskCard } from '../components/TaskCard';
+import { TaskDetailModal } from '../components/TaskDetailModal';
+import { NewTaskModal } from '../components/NewTaskModal';
+import { ActivityFeed } from '../components/ActivityFeed';
+import { Task, User, Workspace, Activity, TaskStatus } from '../types/task';
+import { 
+  mockUsers, 
+  mockWorkspaces, 
+  mockTasks, 
+  mockActivities 
+} from '../utils/mockData';
+import { 
+  Plus, 
+  Search, 
+  CheckCircle2, 
+  Clock, 
+  AlertCircle,
+  HelpCircle,
+  X
+} from 'lucide-react';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { showSuccess } from '../utils/toast';
+
+const Index = () => {
+  // State
+  const [workspaces, setWorkspaces] = useState<Workspace[]>(() => {
+    const saved = localStorage.getItem('cotask_workspaces');
+    return saved ? JSON.parse(saved) : mockWorkspaces;
+  });
+  
+  const [activeWorkspace, setActiveWorkspace] = useState<Workspace>(workspaces[0]);
+  
+  const [users] = useState<User[]>(mockUsers);
+  const [currentUser, setCurrentUser] = useState<User>(mockUsers[0]);
+  
+  const [tasks, setTasks] = useState<Task[]>(() => {
+    const saved = localStorage.getItem('cotask_tasks');
+    return saved ? JSON.parse(saved) : mockTasks;
+  });
+
+  const [activities, setActivities] = useState<Activity[]>(() => {
+    const saved = localStorage.getItem('cotask_activities');
+    return saved ? JSON.parse(saved) : mockActivities;
+  });
+
+  const [isSimulating, setIsSimulating] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  
+  // Android Navigation State
+  const [activeTab, setActiveTab] = useState<AndroidTab>('board');
+  const [activeColumn, setActiveColumn] = useState<TaskStatus>('todo');
   
   // Modals
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -298,150 +397,174 @@ const Index = () => {
     
     const matchesSearch = t.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           t.description.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesPriority = selectedPriority === 'all' || t.priority === selectedPriority;
 
-    return matchesSearch && matchesPriority;
+    return matchesSearch;
   });
 
-  const columns: { id: TaskStatus; title: string; color: string; icon: React.ReactNode }[] = [
+  const columns: { id: TaskStatus; title: string; icon: React.ReactNode }[] = [
     { 
       id: 'todo', 
       title: 'To Do', 
-      color: 'border-t-slate-400 bg-slate-50/50',
-      icon: <HelpCircle className="h-4 w-4 text-slate-500" />
+      icon: <HelpCircle className="h-4 w-4" />
     },
     { 
       id: 'in_progress', 
       title: 'In Progress', 
-      color: 'border-t-indigo-500 bg-indigo-50/10',
-      icon: <Clock className="h-4 w-4 text-indigo-500" />
+      icon: <Clock className="h-4 w-4" />
     },
     { 
       id: 'review', 
-      title: 'In Review', 
-      color: 'border-t-amber-500 bg-amber-50/10',
-      icon: <AlertCircle className="h-4 w-4 text-amber-500" />
+      title: 'Review', 
+      icon: <AlertCircle className="h-4 w-4" />
     },
     { 
       id: 'done', 
       title: 'Done', 
-      color: 'border-t-emerald-500 bg-emerald-50/10',
-      icon: <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+      icon: <CheckCircle2 className="h-4 w-4" />
     },
   ];
 
+  const activeColumnTasks = filteredTasks.filter(t => t.status === activeColumn);
+
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden font-sans">
-      {/* Sidebar */}
-      <WorkspaceSidebar 
-        workspaces={workspaces}
-        activeWorkspace={activeWorkspace}
-        setActiveWorkspace={setActiveWorkspace}
-        users={users}
-        currentUser={currentUser}
-        setCurrentUser={setCurrentUser}
-        isSimulating={isSimulating}
-        setIsSimulating={setIsSimulating}
-        onAddWorkspace={handleAddWorkspace}
-      />
-
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-0 sm:p-4 font-sans">
+      {/* Simulated Android Device Frame */}
+      <div className="w-full max-w-md h-screen sm:h-[840px] bg-slate-50 sm:rounded-[40px] sm:shadow-2xl border-0 sm:border-[10px] border-slate-900 overflow-hidden flex flex-col relative">
         
-        {/* Top Navbar */}
-        <header className="bg-white border-b border-slate-100 px-8 py-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-2xl font-extrabold text-slate-800 tracking-tight">{activeWorkspace.name}</h2>
-              <span className="bg-indigo-50 text-indigo-600 text-xs font-bold px-2.5 py-0.5 rounded-full">
-                {filteredTasks.length} Tasks
-              </span>
-            </div>
-            <p className="text-sm text-slate-500 mt-1 font-medium">{activeWorkspace.description}</p>
-          </div>
+        {/* Android Top App Bar */}
+        <AndroidTopBar 
+          activeWorkspace={activeWorkspace}
+          currentUser={currentUser}
+          onSearchClick={() => setIsSearchOpen(!isSearchOpen)}
+        />
 
-          {/* Search & Filters */}
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="relative w-64">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+        {/* Search Bar Overlay */}
+        {isSearchOpen && (
+          <div className="bg-slate-900 px-4 pb-3 pt-1 flex items-center gap-2 animate-in slide-in-from-top duration-200 shrink-0">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <Input 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search tasks..."
-                className="pl-10 bg-slate-50 border-slate-200 focus:bg-white focus:ring-indigo-500 rounded-xl text-sm"
+                className="pl-9 bg-slate-800 border-slate-700 text-white focus:bg-slate-800 focus:ring-indigo-500 rounded-xl text-xs h-9"
+                autoFocus
               />
             </div>
-
-            <select
-              value={selectedPriority}
-              onChange={(e) => setSelectedPriority(e.target.value)}
-              className="text-sm bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-slate-600"
-            >
-              <option value="all">All Priorities</option>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-
             <Button 
-              onClick={() => setIsNewTaskOpen(true)}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold shadow-lg shadow-indigo-600/10"
+              variant="ghost" 
+              size="icon" 
+              onClick={() => {
+                setSearchQuery('');
+                setIsSearchOpen(false);
+              }}
+              className="text-slate-400 hover:text-white h-9 w-9 rounded-full"
             >
-              <Plus className="h-4 w-4 mr-1.5" /> New Task
+              <X className="h-4 w-4" />
             </Button>
           </div>
-        </header>
+        )}
 
-        {/* Kanban Board Grid */}
-        <main className="flex-1 overflow-x-auto p-8">
-          <div className="flex gap-6 h-full min-w-[1000px]">
-            {columns.map((col) => {
-              const columnTasks = filteredTasks.filter(t => t.status === col.id);
-              return (
-                <div 
-                  key={col.id} 
-                  className={`flex-1 flex flex-col rounded-2xl border-t-4 ${col.color} p-4 max-h-full overflow-hidden`}
-                >
-                  {/* Column Header */}
-                  <div className="flex items-center justify-between mb-4 px-1">
-                    <div className="flex items-center gap-2">
-                      {col.icon}
-                      <h3 className="font-bold text-slate-700 text-sm">{col.title}</h3>
-                    </div>
-                    <span className="bg-slate-200/60 text-slate-600 text-xs font-bold px-2 py-0.5 rounded-full">
-                      {columnTasks.length}
-                    </span>
-                  </div>
-
-                  {/* Column Tasks List */}
-                  <div className="flex-1 overflow-y-auto space-y-4 pr-1 pb-4">
-                    {columnTasks.map((task) => (
-                      <TaskCard 
-                        key={task.id}
-                        task={task}
-                        users={users}
-                        onClick={() => setSelectedTask(task)}
-                        onMoveStatus={handleMoveStatus}
-                      />
-                    ))}
-                    {columnTasks.length === 0 && (
-                      <div className="border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center space-y-2">
-                        <p className="text-xs font-medium text-slate-400">No tasks here</p>
+        {/* Main Content Area based on Active Tab */}
+        <div className="flex-1 overflow-hidden flex flex-col relative">
+          {activeTab === 'board' && (
+            <div className="flex-1 flex flex-col overflow-hidden">
+              {/* Android Column Tabs */}
+              <div className="bg-slate-900 text-white flex border-b border-slate-800/60 shrink-0 select-none">
+                {columns.map((col) => {
+                  const isSelected = activeColumn === col.id;
+                  const count = filteredTasks.filter(t => t.status === col.id).length;
+                  return (
+                    <button
+                      key={col.id}
+                      onClick={() => setActiveColumn(col.id)}
+                      className="flex-1 py-3 flex flex-col items-center gap-1 relative focus:outline-none"
+                    >
+                      <div className={`flex items-center gap-1 text-xs font-bold transition-colors ${
+                        isSelected ? 'text-indigo-400' : 'text-slate-400'
+                      }`}>
+                        <span>{col.title}</span>
+                        <span className="bg-slate-800 text-[10px] px-1.5 py-0.5 rounded-full text-slate-300">
+                          {count}
+                        </span>
                       </div>
-                    )}
+                      {/* Active Indicator Line */}
+                      {isSelected && (
+                        <div className="absolute bottom-0 left-4 right-4 h-0.5 bg-indigo-500 rounded-t-full" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Task List Container */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-3 pb-24">
+                {activeColumnTasks.map((task) => (
+                  <TaskCard 
+                    key={task.id}
+                    task={task}
+                    users={users}
+                    onClick={() => setSelectedTask(task)}
+                    onMoveStatus={handleMoveStatus}
+                  />
+                ))}
+                {activeColumnTasks.length === 0 && (
+                  <div className="flex flex-col items-center justify-center py-20 text-center px-6 space-y-3">
+                    <div className="bg-slate-100 p-4 rounded-full text-slate-400">
+                      <HelpCircle className="h-8 w-8" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-slate-700">No tasks in this stage</p>
+                      <p className="text-xs text-slate-400 mt-1">Tap the FAB button below to create a new task.</p>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        </main>
+                )}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'workspaces' && (
+            <WorkspaceSidebar 
+              workspaces={workspaces}
+              activeWorkspace={activeWorkspace}
+              setActiveWorkspace={setActiveWorkspace}
+              users={users}
+              currentUser={currentUser}
+              setCurrentUser={setCurrentUser}
+              isSimulating={isSimulating}
+              setIsSimulating={setIsSimulating}
+              onAddWorkspace={handleAddWorkspace}
+            />
+          )}
+
+          {activeTab === 'activity' && (
+            <ActivityFeed activities={activities} />
+          )}
+
+          {/* Android Floating Action Button (FAB) */}
+          {activeTab === 'board' && (
+            <button
+              onClick={() => setIsNewTaskOpen(true)}
+              className="absolute bottom-6 right-6 bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-[20px] shadow-xl shadow-indigo-600/30 active:scale-95 transition-all z-20 flex items-center justify-center"
+              title="Create New Task"
+            >
+              <Plus className="h-6 w-6" />
+            </button>
+          )}
+        </div>
+
+        {/* Android Bottom Navigation Bar */}
+        <AndroidBottomNavigation 
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          activityCount={activities.length}
+        />
+
+        {/* Simulated Android Home Indicator Bar */}
+        <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-32 h-1 bg-slate-800/40 rounded-full pointer-events-none hidden sm:block" />
       </div>
 
-      {/* Activity Feed Panel */}
-      <ActivityFeed activities={activities} />
-
-      {/* Modals */}
+      {/* Modals / Bottom Sheets */}
       {selectedTask && (
         <TaskDetailModal 
           task={selectedTask}

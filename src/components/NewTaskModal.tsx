@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Task, User, Priority, TaskStatus } from '../types/task';
-import { X, Plus } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
@@ -43,47 +43,56 @@ export const NewTaskModal: React.FC<NewTaskModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl border border-slate-100 flex flex-col max-h-[90vh] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-end justify-center z-50 select-none">
+      {/* Click outside to close */}
+      <div className="absolute inset-0" onClick={onClose} />
+
+      {/* Android Bottom Sheet Container */}
+      <div className="bg-white rounded-t-[32px] w-full max-w-md shadow-2xl border-t border-slate-100 flex flex-col max-h-[85vh] overflow-hidden animate-in slide-in-from-bottom duration-300 relative z-10">
         
+        {/* Android Drag Handle */}
+        <div className="w-full flex justify-center py-3 shrink-0">
+          <div className="w-12 h-1.5 bg-slate-200 rounded-full" />
+        </div>
+
         {/* Header */}
-        <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-          <h3 className="font-bold text-slate-800 text-lg">Create New Task</h3>
-          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full">
-            <X className="h-5 w-5" />
+        <div className="px-6 pb-4 border-b border-slate-100 flex items-center justify-between">
+          <h3 className="font-extrabold text-slate-800 text-base">Create New Task</h3>
+          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full h-9 w-9">
+            <X className="h-4.5 w-4.5" />
           </Button>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto">
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Task Title</label>
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Task Title</label>
             <Input 
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="What needs to be done?"
-              className="border-slate-200 focus:ring-indigo-500 rounded-xl"
+              className="border-slate-200 focus:ring-indigo-500 rounded-2xl text-sm"
               required
             />
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Description</label>
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Description</label>
             <Textarea 
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Add more details about this task..."
-              className="min-h-[80px] resize-none border-slate-200 focus:ring-indigo-500 rounded-xl"
+              placeholder="Add more details..."
+              className="min-h-[80px] resize-none border-slate-200 focus:ring-indigo-500 rounded-2xl text-sm"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Priority</label>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Priority</label>
               <select 
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as Priority)}
-                className="w-full text-sm bg-white border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full text-xs font-bold bg-white border border-slate-200 rounded-2xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
@@ -91,12 +100,12 @@ export const NewTaskModal: React.FC<NewTaskModalProps> = ({
               </select>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Status</label>
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Status</label>
               <select 
                 value={status}
                 onChange={(e) => setStatus(e.target.value as TaskStatus)}
-                className="w-full text-sm bg-white border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full text-xs font-bold bg-white border border-slate-200 rounded-2xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="todo">To Do</option>
                 <option value="in_progress">In Progress</option>
@@ -106,13 +115,13 @@ export const NewTaskModal: React.FC<NewTaskModalProps> = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Assignee</label>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Assignee</label>
               <select 
                 value={assigneeId}
                 onChange={(e) => setAssigneeId(e.target.value)}
-                className="w-full text-sm bg-white border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full text-xs font-bold bg-white border border-slate-200 rounded-2xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 {users.map(u => (
                   <option key={u.id} value={u.id}>{u.name}</option>
@@ -120,18 +129,18 @@ export const NewTaskModal: React.FC<NewTaskModalProps> = ({
               </select>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Due Date</label>
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Due Date</label>
               <input 
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="w-full text-sm bg-white border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full text-xs font-bold bg-white border border-slate-200 rounded-2xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
           </div>
 
-          <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl py-2.5 font-semibold mt-4">
+          <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl py-3 font-bold mt-4 shadow-lg shadow-indigo-600/20">
             Create Task
           </Button>
         </form>
