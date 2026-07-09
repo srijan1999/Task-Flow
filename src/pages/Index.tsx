@@ -53,10 +53,35 @@ const Index = () => {
   const accent = accentColorMap[accentColor];
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
+    const checkSession = async () => {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      
+      // If Supabase is not configured, use mock session
+      if (!supabaseUrl || !supabaseAnonKey || supabaseUrl === "https://placeholder.supabase.co") {
+        setSession({
+          user: {
+            id: "demo-user",
+            email: "demo@example.com",
+            user_metadata: {
+              name: "Demo User",
+              avatar: mockUsers[0].avatar,
+              role: "Team Member",
+            },
+          },
+        });
+        setLoadingAuth(false);
+        return;
+      }
+
+      // Real Supabase session check
+      const { data } = await supabase.auth.getSession();
       setSession(data.session);
       setLoadingAuth(false);
-    });
+    };
+
+    checkSession();
+    
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_, session) => {
@@ -98,6 +123,16 @@ const Index = () => {
     : mockUsers[0];
 
   const handleLogout = async () => {
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    
+    if (!supabaseUrl || !supabaseAnonKey || supabaseUrl === "https://placeholder.supabase.co") {
+      // Mock logout - redirect to auth screen
+      setSession(null);
+      showSuccess("Logged out");
+      return;
+    }
+
     await supabase.auth.signOut();
     showSuccess("Logged out");
   };
@@ -217,7 +252,7 @@ const Index = () => {
   }
 
   if (!session) {
-    return <AuthScreen accentColor={accentColor} />;
+    return <AuthScreen accentColor={accentColor} onAuthSuccess={(user) => setSession({ user })} />;
   }
 
   const filteredTasks = tasks.filter((t) => {

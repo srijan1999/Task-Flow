@@ -3,7 +3,6 @@ import { Sparkles, Mail, Lock, User as UserIcon, ArrowRight } from "lucide-react
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { showSuccess, showError } from "../utils/toast";
-import { supabase } from "@/integrations/supabase/client";
 import { AccentColor, accentColorMap } from "../types/task";
 
 const avatarOptions = [
@@ -17,9 +16,10 @@ const avatarOptions = [
 
 interface AuthScreenProps {
   accentColor: AccentColor;
+  onAuthSuccess?: (user: any) => void;
 }
 
-export const AuthScreen: React.FC<AuthScreenProps> = ({ accentColor }) => {
+export const AuthScreen: React.FC<AuthScreenProps> = ({ accentColor, onAuthSuccess }) => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -43,6 +43,26 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ accentColor }) => {
 
     setLoading(true);
     try {
+      // Check if Supabase is properly configured
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      
+      if (!supabaseUrl || !supabaseAnonKey || supabaseUrl === "https://placeholder.supabase.co") {
+        // Mock authentication for demo/development
+        showSuccess(isSignUp ? `Welcome, ${name.trim()}!` : "Welcome back!");
+        if (onAuthSuccess) {
+          onAuthSuccess({
+            id: "demo-user",
+            email,
+            user_metadata: { name: name.trim(), avatar: selectedAvatar, role },
+          });
+        }
+        return;
+      }
+
+      // Real Supabase authentication
+      const { supabase } = await import("@/integrations/supabase/client");
+      
       if (isSignUp) {
         const { data, error } = await supabase.auth.signUp({
           email,
@@ -57,13 +77,15 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ accentColor }) => {
           showSuccess("Account created! Please check your email to confirm.");
         } else {
           showSuccess(`Welcome to CoTask, ${name.trim()}!`);
+          if (onAuthSuccess) onAuthSuccess(data.user);
         }
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { error, data } = await supabase.auth.signInWithPassword({ email, password });
         if (error) {
           showError(error.message);
         } else {
           showSuccess("Welcome back!");
+          if (onAuthSuccess) onAuthSuccess(data.user);
         }
       }
     } catch (err) {
