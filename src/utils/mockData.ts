@@ -53,11 +53,12 @@ export const mockWorkspaces: Workspace[] = [
 ];
 
 export const mockTags: Tag[] = [
-  { id: 'tag-1', name: 'Design', color: 'indigo' },
-  { id: 'tag-2', name: 'Bug', color: 'rose' },
-  { id: 'tag-3', name: 'Feature', color: 'emerald' },
-  { id: 'tag-4', name: 'Marketing', color: 'amber' },
-  { id: 'tag-5', name: 'Refactor', color: 'sky' }
+  { id: 'tag-1', name: '1st Proof', color: 'indigo' },
+  { id: 'tag-2', name: '2nd Proof', color: 'rose' },
+  { id: 'tag-3', name: '3rd Proof', color: 'emerald' },
+  { id: 'tag-4', name: 'Final Proof', color: 'amber' },
+  { id: 'tag-5', name: 'Content Writing', color: 'sky' },
+  { id: 'tag-6', name: 'Editing', color: 'violet' }
 ];
 
 export const mockTasks: Task[] = [
@@ -85,7 +86,7 @@ export const mockTasks: Task[] = [
         createdAt: '2 hours ago'
       }
     ],
-    tagIds: ['tag-1', 'tag-3'],
+    tagIds: ['tag-1', 'tag-5'],
     createdAt: '2025-03-01'
   },
   {
@@ -103,7 +104,7 @@ export const mockTasks: Task[] = [
       { id: 's6', title: 'Add route guards', completed: false }
     ],
     comments: [],
-    tagIds: ['tag-3'],
+    tagIds: ['tag-6'],
     createdAt: '2025-03-02'
   },
   {
@@ -147,7 +148,7 @@ export const mockTasks: Task[] = [
       { id: 's11', title: 'Add indexes to tasks table', completed: true }
     ],
     comments: [],
-    tagIds: ['tag-5'],
+    tagIds: ['tag-3'],
     createdAt: '2025-03-04'
   },
   {
@@ -161,7 +162,7 @@ export const mockTasks: Task[] = [
     dueDate: '2025-03-20',
     subtasks: [],
     comments: [],
-    tagIds: ['tag-4'],
+    tagIds: ['tag-5'],
     createdAt: '2025-03-05'
   }
 ];
