@@ -1,341 +1,200 @@
-import React, { useState, useEffect } from 'react';
-import { AndroidTopBar } from '../components/AndroidTopBar';
-import { AndroidBottomNavigation, AndroidTab } from '../components/AndroidBottomNavigation';
-import { WorkspaceSidebar } from '../components/WorkspaceSidebar';
-import { TaskCard } from '../components/TaskCard';
-import { TaskDetailModal } from '../components/TaskDetailModal';
-import { NewTaskModal } from '../components/NewTaskModal';
-import { ActivityFeed } from '../components/ActivityFeed';
-import { Task, User, Workspace, Activity, TaskStatus, Tag, AccentColor, accentColorMap } from '../types/task';
-import { 
-  mockUsers, 
-  mockWorkspaces, 
-  mockTasks, 
-  mockActivities,
-  mockTags
-} from '../utils/mockData';
-import { 
-  Plus, 
-  Search, 
-  CheckCircle2, 
-  Clock, 
-  HelpCircle,
-  X
-} from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { showSuccess } from '../utils/toast';
+import React, { useState, useEffect } from "react";
+import { AppHeader } from "../components/AppHeader";
+import { WorkspaceSidebar } from "../components/WorkspaceSidebar";
+import { TaskCard } from "../components/TaskCard";
+import { TaskDetailModal } from "../components/TaskDetailModal";
+import { NewTaskModal } from "../components/NewTaskModal";
+import { ActivityFeed } from "../components/ActivityFeed";
+import { AuthScreen } from "../components/AuthScreen";
+import { Task, User, Workspace, Activity, TaskStatus, Tag, AccentColor, accentColorMap } from "../types/task";
+import { mockUsers, mockWorkspaces, mockTasks, mockActivities, mockTags } from "../utils/mockData";
+import { CheckCircle2, Clock, HelpCircle, Radio } from "lucide-react";
+import { Sheet, SheetContent } from "../components/ui/sheet";
+import { showSuccess } from "../utils/toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
-  // State
+  const [session, setSession] = useState<any>(null);
+  const [loadingAuth, setLoadingAuth] = useState(true);
+
   const [workspaces, setWorkspaces] = useState<Workspace[]>(() => {
-    const saved = localStorage.getItem('cotask_workspaces');
+    const saved = localStorage.getItem("cotask_workspaces");
     return saved ? JSON.parse(saved) : mockWorkspaces;
   });
-  
   const [activeWorkspace, setActiveWorkspace] = useState<Workspace>(workspaces[0]);
-  
   const [users] = useState<User[]>(mockUsers);
-  const [currentUser, setCurrentUser] = useState<User>(mockUsers[0]);
-  
   const [tags, setTags] = useState<Tag[]>(() => {
-    const saved = localStorage.getItem('cotask_tags');
+    const saved = localStorage.getItem("cotask_tags");
     return saved ? JSON.parse(saved) : mockTags;
   });
-
   const [tasks, setTasks] = useState<Task[]>(() => {
-    const saved = localStorage.getItem('cotask_tasks');
+    const saved = localStorage.getItem("cotask_tasks");
     return saved ? JSON.parse(saved) : mockTasks;
   });
-
   const [activities, setActivities] = useState<Activity[]>(() => {
-    const saved = localStorage.getItem('cotask_activities');
+    const saved = localStorage.getItem("cotask_activities");
     return saved ? JSON.parse(saved) : mockActivities;
   });
-
-  const [isSimulating, setIsSimulating] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  
-  // Dark Mode State
+  const [searchQuery, setSearchQuery] = useState("");
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
-    const saved = localStorage.getItem('cotask_dark_mode');
+    const saved = localStorage.getItem("cotask_dark_mode");
     return saved ? JSON.parse(saved) : false;
   });
-
-  // Accent Color State
   const [accentColor, setAccentColor] = useState<AccentColor>(() => {
-    const saved = localStorage.getItem('cotask_accent_color');
-    return saved ? (saved as AccentColor) : 'indigo';
+    const saved = localStorage.getItem("cotask_accent_color");
+    return saved ? (saved as AccentColor) : "indigo";
   });
-  
-  // Android Navigation State
-  const [activeTab, setActiveTab] = useState<AndroidTab>('board');
-  const [activeColumn, setActiveColumn] = useState<TaskStatus>('todo');
-  
-  // Modals
+  const [activeTab, setActiveTab] = useState<"board" | "activity">("board");
+  const [activeColumn, setActiveColumn] = useState<TaskStatus>("todo");
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isNewTaskOpen, setIsNewTaskOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const accent = accentColorMap[accentColor];
 
-  // Save to localStorage
   useEffect(() => {
-    localStorage.setItem('cotask_workspaces', JSON.stringify(workspaces));
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      setLoadingAuth(false);
+    });
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_, session) => {
+      setSession(session);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("cotask_workspaces", JSON.stringify(workspaces));
   }, [workspaces]);
-
   useEffect(() => {
-    localStorage.setItem('cotask_tasks', JSON.stringify(tasks));
+    localStorage.setItem("cotask_tasks", JSON.stringify(tasks));
   }, [tasks]);
-
   useEffect(() => {
-    localStorage.setItem('cotask_activities', JSON.stringify(activities));
+    localStorage.setItem("cotask_activities", JSON.stringify(activities));
   }, [activities]);
-
   useEffect(() => {
-    localStorage.setItem('cotask_dark_mode', JSON.stringify(isDarkMode));
+    localStorage.setItem("cotask_dark_mode", JSON.stringify(isDarkMode));
   }, [isDarkMode]);
-
   useEffect(() => {
-    localStorage.setItem('cotask_tags', JSON.stringify(tags));
+    localStorage.setItem("cotask_tags", JSON.stringify(tags));
   }, [tags]);
-
   useEffect(() => {
-    localStorage.setItem('cotask_accent_color', accentColor);
+    localStorage.setItem("cotask_accent_color", accentColor);
   }, [accentColor]);
 
-  // Live Simulation Effect
-  useEffect(() => {
-    if (!isSimulating) return;
-
-    const interval = setInterval(() => {
-      // Pick a random user other than current user
-      const otherUsers = users.filter(u => u.id !== currentUser.id);
-      if (otherUsers.length === 0) return;
-      const randomUser = otherUsers[Math.floor(Math.random() * otherUsers.length)];
-
-      // Pick a random task in the active workspace
-      const workspaceTasks = tasks.filter(t => t.workspaceId === activeWorkspace.id);
-      if (workspaceTasks.length === 0) return;
-      const randomTask = workspaceTasks[Math.floor(Math.random() * workspaceTasks.length)];
-
-      // Decide on a random action
-      const actions = ['move', 'comment', 'subtask'];
-      const randomAction = actions[Math.floor(Math.random() * actions.length)];
-
-      if (randomAction === 'move') {
-        const statuses: TaskStatus[] = ['todo', 'in_progress', 'done'];
-        const currentStatusIndex = statuses.indexOf(randomTask.status === 'review' ? 'in_progress' : randomTask.status);
-        let nextStatusIndex = currentStatusIndex + (Math.random() > 0.5 ? 1 : -1);
-        if (nextStatusIndex < 0) nextStatusIndex = 1;
-        if (nextStatusIndex >= statuses.length) nextStatusIndex = statuses.length - 2;
-        
-        const nextStatus = statuses[nextStatusIndex];
-        
-        setTasks(prev => prev.map(t => 
-          t.id === randomTask.id ? { ...t, status: nextStatus } : t
-        ));
-
-        const statusLabels = {
-          todo: 'To Do',
-          in_progress: 'In Progress',
-          review: 'In Progress',
-          done: 'Done'
-        };
-
-        const newActivity: Activity = {
-          id: `act-${Date.now()}`,
-          userId: randomUser.id,
-          userName: randomUser.name,
-          userAvatar: randomUser.avatar,
-          action: `moved to ${statusLabels[nextStatus]}`,
-          targetName: randomTask.title,
-          timestamp: 'Just now'
-        };
-
-        setActivities(prev => [newActivity, ...prev].slice(0, 20));
-        showSuccess(`${randomUser.name} moved "${randomTask.title}" to ${statusLabels[nextStatus]}`);
-      } else if (randomAction === 'comment') {
-        const commentsList = [
-          "I'm on it! Let me know if you need help.",
-          "Looks great, ready for review.",
-          "Can we double check the requirements on this?",
-          "Just finished my part of the work.",
-          "Let's discuss this in the next sync."
-        ];
-        const randomCommentText = commentsList[Math.floor(Math.random() * commentsList.length)];
-
-        const newComment = {
-          id: `comment-${Date.now()}`,
-          userId: randomUser.id,
-          userName: randomUser.name,
-          userAvatar: randomUser.avatar,
-          text: randomCommentText,
-          createdAt: 'Just now'
-        };
-
-        setTasks(prev => prev.map(t => 
-          t.id === randomTask.id ? { ...t, comments: [newComment, ...t.comments] } : t
-        ));
-
-        const newActivity: Activity = {
-          id: `act-${Date.now()}`,
-          userId: randomUser.id,
-          userName: randomUser.name,
-          userAvatar: randomUser.avatar,
-          action: 'commented on',
-          targetName: randomTask.title,
-          timestamp: 'Just now'
-        };
-
-        setActivities(prev => [newActivity, ...prev].slice(0, 20));
-        showSuccess(`${randomUser.name} commented on "${randomTask.title}"`);
-      } else if (randomAction === 'subtask' && randomTask.subtasks.length > 0) {
-        const randomSubtaskIndex = Math.floor(Math.random() * randomTask.subtasks.length);
-        const updatedSubtasks = [...randomTask.subtasks];
-        const targetSubtask = updatedSubtasks[randomSubtaskIndex];
-        targetSubtask.completed = !targetSubtask.completed;
-
-        setTasks(prev => prev.map(t => 
-          t.id === randomTask.id ? { ...t, subtasks: updatedSubtasks } : t
-        ));
-
-        const newActivity: Activity = {
-          id: `act-${Date.now()}`,
-          userId: randomUser.id,
-          userName: randomUser.name,
-          userAvatar: randomUser.avatar,
-          action: targetSubtask.completed ? 'completed subtask in' : 'reopened subtask in',
-          targetName: randomTask.title,
-          timestamp: 'Just now'
-        };
-
-        setActivities(prev => [newActivity, ...prev].slice(0, 20));
+  const currentUser: User = session
+    ? {
+        id: session.user.id,
+        name:
+          session.user.user_metadata?.name ||
+          session.user.email?.split("@")[0] ||
+          "User",
+        avatar: session.user.user_metadata?.avatar || mockUsers[0].avatar,
+        color: `bg-${accentColor}-500`,
+        role: session.user.user_metadata?.role || "Team Member",
       }
+    : mockUsers[0];
 
-    }, 12000); // Every 12 seconds
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    showSuccess("Logged out");
+  };
 
-    return () => clearInterval(interval);
-  }, [isSimulating, tasks, activeWorkspace, users, currentUser]);
-
-  // Handlers
   const handleAddWorkspace = (name: string, description: string) => {
-    const newWs: Workspace = {
-      id: `w-${Date.now()}`,
-      name,
-      description,
-      icon: 'Sparkles'
-    };
-    setWorkspaces(prev => [...prev, newWs]);
+    const newWs: Workspace = { id: `w-${Date.now()}`, name, description, icon: "Sparkles" };
+    setWorkspaces((prev) => [...prev, newWs]);
     setActiveWorkspace(newWs);
     showSuccess(`Workspace "${name}" created!`);
   };
 
   const handleAddTag = (name: string, color: string) => {
-    const newTag: Tag = {
-      id: `tag-${Date.now()}`,
-      name,
-      color
-    };
-    setTags(prev => [...prev, newTag]);
+    const newTag: Tag = { id: `tag-${Date.now()}`, name, color };
+    setTags((prev) => [...prev, newTag]);
     showSuccess(`Tag "${name}" created!`);
   };
 
   const handleDeleteTag = (tagId: string) => {
-    setTags(prev => prev.filter(t => t.id !== tagId));
-    // Also remove this tag from any tasks that have it
-    setTasks(prev => prev.map(t => ({
-      ...t,
-      tagIds: t.tagIds?.filter(id => id !== tagId) || []
-    })));
+    setTags((prev) => prev.filter((t) => t.id !== tagId));
+    setTasks((prev) =>
+      prev.map((t) => ({ ...t, tagIds: t.tagIds?.filter((id) => id !== tagId) || [] })),
+    );
     showSuccess(`Tag deleted`);
   };
 
-  const handleAddTask = (taskData: Omit<Task, 'id' | 'comments' | 'createdAt'>) => {
+  const handleAddTask = (taskData: Omit<Task, "id" | "comments" | "createdAt">) => {
     const newTask: Task = {
       ...taskData,
       id: `task-${Date.now()}`,
       comments: [],
-      createdAt: new Date().toISOString().split('T')[0]
+      createdAt: new Date().toISOString().split("T")[0],
     };
-
-    setTasks(prev => [newTask, ...prev]);
-
+    setTasks((prev) => [newTask, ...prev]);
     const newActivity: Activity = {
       id: `act-${Date.now()}`,
       userId: currentUser.id,
       userName: currentUser.name,
       userAvatar: currentUser.avatar,
-      action: 'created task',
+      action: "created task",
       targetName: newTask.title,
-      timestamp: 'Just now'
+      timestamp: "Just now",
     };
-    setActivities(prev => [newActivity, ...prev]);
+    setActivities((prev) => [newActivity, ...prev]);
     showSuccess(`Task "${newTask.title}" created!`);
   };
 
   const handleUpdateTask = (updatedTask: Task) => {
-    setTasks(prev => prev.map(t => t.id === updatedTask.id ? updatedTask : t));
-    if (selectedTask?.id === updatedTask.id) {
-      setSelectedTask(updatedTask);
-    }
-
-    // Log activity for updates
+    setTasks((prev) => prev.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
+    if (selectedTask?.id === updatedTask.id) setSelectedTask(updatedTask);
     const newActivity: Activity = {
       id: `act-${Date.now()}`,
       userId: currentUser.id,
       userName: currentUser.name,
       userAvatar: currentUser.avatar,
-      action: 'updated details of',
+      action: "updated details of",
       targetName: updatedTask.title,
-      timestamp: 'Just now'
+      timestamp: "Just now",
     };
-    setActivities(prev => [newActivity, ...prev]);
+    setActivities((prev) => [newActivity, ...prev]);
   };
 
   const handleDeleteTask = (taskId: string) => {
-    const taskToDelete = tasks.find(t => t.id === taskId);
-    setTasks(prev => prev.filter(t => t.id !== taskId));
+    const taskToDelete = tasks.find((t) => t.id === taskId);
+    setTasks((prev) => prev.filter((t) => t.id !== taskId));
     setSelectedTask(null);
-
     if (taskToDelete) {
       const newActivity: Activity = {
         id: `act-${Date.now()}`,
         userId: currentUser.id,
         userName: currentUser.name,
         userAvatar: currentUser.avatar,
-        action: 'deleted task',
+        action: "deleted task",
         targetName: taskToDelete.title,
-        timestamp: 'Just now'
+        timestamp: "Just now",
       };
-      setActivities(prev => [newActivity, ...prev]);
+      setActivities((prev) => [newActivity, ...prev]);
       showSuccess(`Task deleted`);
     }
   };
 
-  const handleMoveStatus = (taskId: string, direction: 'left' | 'right') => {
-    const statuses: TaskStatus[] = ['todo', 'in_progress', 'done'];
-    const task = tasks.find(t => t.id === taskId);
+  const handleMoveStatus = (taskId: string, direction: "left" | "right") => {
+    const statuses: TaskStatus[] = ["todo", "in_progress", "done"];
+    const task = tasks.find((t) => t.id === taskId);
     if (!task) return;
-
-    // Map review status to in_progress if any legacy tasks exist
-    const currentStatus = task.status === 'review' ? 'in_progress' : task.status;
+    const currentStatus = task.status === "review" ? "in_progress" : task.status;
     const currentIndex = statuses.indexOf(currentStatus);
-    let nextIndex = currentIndex + (direction === 'right' ? 1 : -1);
-    
+    let nextIndex = currentIndex + (direction === "right" ? 1 : -1);
     if (nextIndex >= 0 && nextIndex < statuses.length) {
       const nextStatus = statuses[nextIndex];
       const updatedTask = { ...task, status: nextStatus };
-      
-      setTasks(prev => prev.map(t => t.id === taskId ? updatedTask : t));
-
+      setTasks((prev) => prev.map((t) => (t.id === taskId ? updatedTask : t)));
       const statusLabels = {
-        todo: 'To Do',
-        in_progress: 'In Progress',
-        review: 'In Progress',
-        done: 'Done'
+        todo: "To Do",
+        in_progress: "In Progress",
+        review: "In Progress",
+        done: "Done",
       };
-
       const newActivity: Activity = {
         id: `act-${Date.now()}`,
         userId: currentUser.id,
@@ -343,203 +202,183 @@ const Index = () => {
         userAvatar: currentUser.avatar,
         action: `moved to ${statusLabels[nextStatus]}`,
         targetName: task.title,
-        timestamp: 'Just now'
+        timestamp: "Just now",
       };
-      setActivities(prev => [newActivity, ...prev]);
+      setActivities((prev) => [newActivity, ...prev]);
     }
   };
 
-  // Filter tasks
-  const filteredTasks = tasks.filter(t => {
-    if (t.workspaceId !== activeWorkspace.id) return false;
-    
-    const matchesSearch = t.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          t.description.toLowerCase().includes(searchQuery.toLowerCase());
+  if (loadingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400">
+        Loading...
+      </div>
+    );
+  }
 
+  if (!session) {
+    return <AuthScreen accentColor={accentColor} />;
+  }
+
+  const filteredTasks = tasks.filter((t) => {
+    if (t.workspaceId !== activeWorkspace.id) return false;
+    const matchesSearch =
+      t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      t.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSearch;
   });
 
   const columns: { id: TaskStatus; title: string; icon: React.ReactNode }[] = [
-    { 
-      id: 'todo', 
-      title: 'To Do', 
-      icon: <HelpCircle className="h-4 w-4" />
-    },
-    { 
-      id: 'in_progress', 
-      title: 'In Progress', 
-      icon: <Clock className="h-4 w-4" />
-    },
-    { 
-      id: 'done', 
-      title: 'Done', 
-      icon: <CheckCircle2 className="h-4 w-4" />
-    },
+    { id: "todo", title: "To Do", icon: <HelpCircle className="h-4 w-4" /> },
+    { id: "in_progress", title: "In Progress", icon: <Clock className="h-4 w-4" /> },
+    { id: "done", title: "Done", icon: <CheckCircle2 className="h-4 w-4" /> },
   ];
 
-  // Map legacy 'review' tasks to 'in_progress' for display
-  const activeColumnTasks = filteredTasks.filter(t => {
-    const currentStatus = t.status === 'review' ? 'in_progress' : t.status;
+  const activeColumnTasks = filteredTasks.filter((t) => {
+    const currentStatus = t.status === "review" ? "in_progress" : t.status;
     return currentStatus === activeColumn;
   });
 
+  const sidebarContent = (
+    <WorkspaceSidebar
+      workspaces={workspaces}
+      activeWorkspace={activeWorkspace}
+      setActiveWorkspace={(ws) => {
+        setActiveWorkspace(ws);
+        setIsSidebarOpen(false);
+      }}
+      onAddWorkspace={handleAddWorkspace}
+      isDarkMode={isDarkMode}
+      onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
+      tags={tags}
+      onAddTag={handleAddTag}
+      onDeleteTag={handleDeleteTag}
+      accentColor={accentColor}
+      onAccentColorChange={setAccentColor}
+    />
+  );
+
   return (
-    <div className={`min-h-screen bg-slate-950 flex items-center justify-center p-0 sm:p-4 font-sans ${isDarkMode ? 'dark' : ''}`}>
-      {/* Simulated Android Device Frame */}
-      <div className="w-full max-w-md h-screen sm:h-[840px] bg-slate-50 dark:bg-slate-950 sm:rounded-[40px] sm:shadow-2xl border-0 sm:border-[10px] border-slate-900 overflow-hidden flex flex-col relative transition-colors duration-200">
-        
-        {/* Android Top App Bar */}
-        <AndroidTopBar 
-          activeWorkspace={activeWorkspace}
-          currentUser={currentUser}
-          onSearchClick={() => setIsSearchOpen(!isSearchOpen)}
-          isDarkMode={isDarkMode}
-          onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-          accentColor={accentColor}
-        />
+    <div
+      className={`min-h-screen bg-slate-50 dark:bg-slate-950 ${isDarkMode ? "dark" : ""} transition-colors duration-200 font-sans`}
+    >
+      <div className="flex h-screen overflow-hidden">
+        {/* Desktop Sidebar */}
+        <aside className="hidden lg:flex w-80 flex-col border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0">
+          {sidebarContent}
+        </aside>
 
-        {/* Search Bar Overlay */}
-        {isSearchOpen && (
-          <div className="bg-slate-900 px-4 pb-3 pt-1 flex items-center gap-2 animate-in slide-in-from-top duration-200 shrink-0">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-              <Input 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search tasks..."
-                className={`pl-9 bg-slate-800 border-slate-700 text-white ${accent.ring} rounded-xl text-xs h-9`}
-                autoFocus
-              />
-            </div>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={() => {
-                setSearchQuery('');
-                setIsSearchOpen(false);
-              }}
-              className="text-slate-400 hover:text-white h-9 w-9 rounded-full"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
+        {/* Main */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <AppHeader
+            activeWorkspace={activeWorkspace}
+            currentUser={currentUser}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            isDarkMode={isDarkMode}
+            onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
+            accentColor={accentColor}
+            onLogout={handleLogout}
+            onNewTask={() => setIsNewTaskOpen(true)}
+            onMenuClick={() => setIsSidebarOpen(true)}
+          />
 
-        {/* Main Content Area based on Active Tab */}
-        <div className="flex-1 overflow-hidden flex flex-col relative">
-          {activeTab === 'board' && (
-            <div className="flex-1 flex flex-col overflow-hidden">
-              {/* Android Column Tabs */}
-              <div className="bg-slate-900 text-white flex border-b border-slate-800/60 shrink-0 select-none">
-                {columns.map((col) => {
-                  const isSelected = activeColumn === col.id;
-                  const count = filteredTasks.filter(t => {
-                    const currentStatus = t.status === 'review' ? 'in_progress' : t.status;
-                    return currentStatus === col.id;
-                  }).length;
-                  return (
-                    <button
-                      key={col.id}
-                      onClick={() => setActiveColumn(col.id)}
-                      className="flex-1 py-3 flex flex-col items-center gap-1 relative focus:outline-none"
-                    >
-                      <div className={`flex items-center gap-1 text-xs font-bold transition-colors ${
-                        isSelected ? accent.textMuted : 'text-slate-400'
-                      }`}>
-                        <span>{col.title}</span>
-                        <span className="bg-slate-800 text-[10px] px-1.5 py-0.5 rounded-full text-slate-300">
-                          {count}
-                        </span>
-                      </div>
-                      {/* Active Indicator Line */}
-                      {isSelected && (
-                        <div className={`absolute bottom-0 left-4 right-4 h-0.5 ${accent.bg} rounded-t-full`} />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Task List Container */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-3 pb-24">
-                {activeColumnTasks.map((task) => (
-                  <TaskCard 
-                    key={task.id}
-                    task={task}
-                    users={users}
-                    tags={tags}
-                    onClick={() => setSelectedTask(task)}
-                    onMoveStatus={handleMoveStatus}
-                    accentColor={accentColor}
-                  />
-                ))}
-                {activeColumnTasks.length === 0 && (
-                  <div className="flex flex-col items-center justify-center py-20 text-center px-6 space-y-3">
-                    <div className="bg-slate-100 dark:bg-slate-900 p-4 rounded-full text-slate-400 dark:text-slate-600 transition-colors">
-                      <HelpCircle className="h-8 w-8" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-slate-700 dark:text-slate-300">No tasks in this stage</p>
-                      <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Tap the FAB button below to create a new task.</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'workspaces' && (
-            <WorkspaceSidebar 
-              workspaces={workspaces}
-              activeWorkspace={activeWorkspace}
-              setActiveWorkspace={setActiveWorkspace}
-              users={users}
-              currentUser={currentUser}
-              setCurrentUser={setCurrentUser}
-              isSimulating={isSimulating}
-              setIsSimulating={setIsSimulating}
-              onAddWorkspace={handleAddWorkspace}
-              isDarkMode={isDarkMode}
-              onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-              tags={tags}
-              onAddTag={handleAddTag}
-              onDeleteTag={handleDeleteTag}
-              accentColor={accentColor}
-              onAccentColorChange={setAccentColor}
-            />
-          )}
-
-          {activeTab === 'activity' && (
-            <ActivityFeed activities={activities} accentColor={accentColor} />
-          )}
-
-          {/* Android Floating Action Button (FAB) */}
-          {activeTab === 'board' && (
+          {/* Tabs */}
+          <div className="flex border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 shrink-0">
             <button
-              onClick={() => setIsNewTaskOpen(true)}
-              className={`absolute bottom-6 right-6 ${accent.bg} ${accent.bgHover} text-white p-4 rounded-[20px] shadow-xl ${accent.shadowFab} active:scale-95 transition-all z-20 flex items-center justify-center`}
-              title="Create New Task"
+              onClick={() => setActiveTab("board")}
+              className={`py-3 px-4 text-sm font-bold transition-colors ${
+                activeTab === "board" ? accent.text : "text-slate-500 dark:text-slate-400"
+              }`}
             >
-              <Plus className="h-6 w-6" />
+              Board
             </button>
-          )}
+            <button
+              onClick={() => setActiveTab("activity")}
+              className={`py-3 px-4 text-sm font-bold flex items-center gap-1.5 transition-colors ${
+                activeTab === "activity" ? accent.text : "text-slate-500 dark:text-slate-400"
+              }`}
+            >
+              <Radio className="h-4 w-4" /> Activity
+            </button>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 overflow-hidden flex flex-col">
+            {activeTab === "board" && (
+              <div className="flex-1 flex flex-col overflow-hidden">
+                <div className="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 shrink-0">
+                  {columns.map((col) => {
+                    const isSelected = activeColumn === col.id;
+                    const count = filteredTasks.filter((t) => {
+                      const s = t.status === "review" ? "in_progress" : t.status;
+                      return s === col.id;
+                    }).length;
+                    return (
+                      <button
+                        key={col.id}
+                        onClick={() => setActiveColumn(col.id)}
+                        className="py-3 px-4 text-sm font-bold relative"
+                      >
+                        <span className={isSelected ? accent.text : "text-slate-500 dark:text-slate-400"}>
+                          {col.title}{" "}
+                          <span className="bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded-full text-xs">
+                            {count}
+                          </span>
+                        </span>
+                        {isSelected && (
+                          <div
+                            className={`absolute bottom-0 left-2 right-2 h-0.5 ${accent.bg} rounded-t-full`}
+                          />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                  {activeColumnTasks.map((task) => (
+                    <TaskCard
+                      key={task.id}
+                      task={task}
+                      users={users}
+                      tags={tags}
+                      onClick={() => setSelectedTask(task)}
+                      onMoveStatus={handleMoveStatus}
+                      accentColor={accentColor}
+                    />
+                  ))}
+                  {activeColumnTasks.length === 0 && (
+                    <div className="flex flex-col items-center justify-center py-20 text-center px-6 space-y-3">
+                      <div className="bg-slate-100 dark:bg-slate-900 p-4 rounded-full text-slate-400 dark:text-slate-600">
+                        <HelpCircle className="h-8 w-8" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-slate-700 dark:text-slate-300">
+                          No tasks in this stage
+                        </p>
+                        <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+                          Click "New Task" to create one.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            {activeTab === "activity" && <ActivityFeed activities={activities} accentColor={accentColor} />}
+          </div>
         </div>
-
-        {/* Android Bottom Navigation Bar */}
-        <AndroidBottomNavigation 
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          activityCount={activities.length}
-          accentColor={accentColor}
-        />
-
-        {/* Simulated Android Home Indicator Bar */}
-        <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-32 h-1 bg-slate-800/40 rounded-full pointer-events-none hidden sm:block" />
       </div>
 
-      {/* Modals / Bottom Sheets */}
+      {/* Mobile Sidebar Sheet */}
+      <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
+        <SheetContent side="left" className="w-80 p-0 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800">
+          {sidebarContent}
+        </SheetContent>
+      </Sheet>
+
       {selectedTask && (
-        <TaskDetailModal 
+        <TaskDetailModal
           task={selectedTask}
           users={users}
           tags={tags}
@@ -552,7 +391,7 @@ const Index = () => {
       )}
 
       {isNewTaskOpen && (
-        <NewTaskModal 
+        <NewTaskModal
           users={users}
           tags={tags}
           workspaceId={activeWorkspace.id}

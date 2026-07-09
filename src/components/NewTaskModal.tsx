@@ -1,27 +1,27 @@
-import React, { useState } from 'react';
-import { Task, User, Priority, TaskStatus, Tag, AccentColor, accentColorMap } from '../types/task';
-import { X, Tag as TagIcon } from 'lucide-react';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Textarea } from './ui/textarea';
+import React, { useState } from "react";
+import { Task, User, Priority, TaskStatus, Tag, AccentColor, accentColorMap } from "../types/task";
+import { X, Tag as TagIcon } from "lucide-react";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Textarea } from "./ui/textarea";
 
 interface NewTaskModalProps {
   users: User[];
   tags: Tag[];
   workspaceId: string;
   onClose: () => void;
-  onAddTask: (task: Omit<Task, 'id' | 'comments' | 'createdAt'>) => void;
+  onAddTask: (task: Omit<Task, "id" | "comments" | "createdAt">) => void;
   accentColor: AccentColor;
 }
 
 const tagColorMap: Record<string, string> = {
-  indigo: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20',
-  rose: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
-  emerald: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
-  amber: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
-  sky: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20',
-  violet: 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20',
-  fuchsia: 'bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400 border-fuchsia-500/20',
+  indigo: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20",
+  rose: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20",
+  emerald: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+  amber: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+  sky: "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20",
+  violet: "bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20",
+  fuchsia: "bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400 border-fuchsia-500/20",
 };
 
 export const NewTaskModal: React.FC<NewTaskModalProps> = ({
@@ -32,12 +32,12 @@ export const NewTaskModal: React.FC<NewTaskModalProps> = ({
   onAddTask,
   accentColor,
 }) => {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [priority, setPriority] = useState<Priority>('medium');
-  const [status, setStatus] = useState<TaskStatus>('todo');
-  const [assigneeId, setAssigneeId] = useState(users[0]?.id || '');
-  const [dueDate, setDueDate] = useState(new Date().toISOString().split('T')[0]);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [priority, setPriority] = useState<Priority>("medium");
+  const [status, setStatus] = useState<TaskStatus>("todo");
+  const [assigneeId, setAssigneeId] = useState(users[0]?.id || "");
+  const [dueDate, setDueDate] = useState(new Date().toISOString().split("T")[0]);
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
 
   const accent = accentColorMap[accentColor];
@@ -45,53 +45,36 @@ export const NewTaskModal: React.FC<NewTaskModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
-
-    onAddTask({
-      title,
-      description,
-      priority,
-      status,
-      assigneeId,
-      workspaceId,
-      dueDate,
-      subtasks: [],
-      tagIds: selectedTagIds,
-    });
+    onAddTask({ title, description, priority, status, assigneeId, workspaceId, dueDate, subtasks: [], tagIds: selectedTagIds });
     onClose();
   };
 
   const handleToggleTag = (tagId: string) => {
-    setSelectedTagIds(prev => 
-      prev.includes(tagId) ? prev.filter(id => id !== tagId) : [...prev, tagId]
-    );
+    setSelectedTagIds((prev) => (prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId]));
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-end justify-center z-50 select-none">
-      {/* Click outside to close */}
+    <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="absolute inset-0" onClick={onClose} />
-
-      {/* Android Bottom Sheet Container */}
-      <div className="bg-white dark:bg-slate-900 rounded-t-[32px] w-full max-w-md shadow-2xl border-t border-slate-100 dark:border-slate-800 flex flex-col max-h-[85vh] overflow-hidden animate-in slide-in-from-bottom duration-300 relative z-10 transition-colors duration-200">
-        
-        {/* Android Drag Handle */}
-        <div className="w-full flex justify-center py-3 shrink-0">
-          <div className="w-12 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full" />
-        </div>
-
-        {/* Header */}
-        <div className="px-6 pb-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-lg shadow-2xl border border-slate-100 dark:border-slate-800 flex flex-col max-h-[90vh] overflow-hidden relative z-10 transition-colors duration-200">
+        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <h3 className="font-extrabold text-slate-800 dark:text-slate-100 text-base">Create New Task</h3>
-          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full h-9 w-9 text-slate-500 dark:text-slate-400">
-            <X className="h-4.5 w-4.5" />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="rounded-full h-9 w-9 text-slate-500 dark:text-slate-400"
+          >
+            <X className="h-4 w-4" />
           </Button>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto">
           <div className="space-y-1">
-            <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Task Title</label>
-            <Input 
+            <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+              Task Title
+            </label>
+            <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="What needs to be done?"
@@ -99,21 +82,23 @@ export const NewTaskModal: React.FC<NewTaskModalProps> = ({
               required
             />
           </div>
-
           <div className="space-y-1">
-            <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Description</label>
-            <Textarea 
+            <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+              Description
+            </label>
+            <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Add more details..."
               className={`min-h-[80px] resize-none border-slate-200 dark:border-slate-800 bg-transparent dark:text-slate-200 ${accent.ring} rounded-2xl text-sm`}
             />
           </div>
-
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Priority</label>
-              <select 
+              <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                Priority
+              </label>
+              <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as Priority)}
                 className={`w-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-2xl px-3 py-2.5 focus:outline-none focus:ring-2 ${accent.ring}`}
@@ -123,10 +108,11 @@ export const NewTaskModal: React.FC<NewTaskModalProps> = ({
                 <option value="high">High</option>
               </select>
             </div>
-
             <div className="space-y-1">
-              <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Status</label>
-              <select 
+              <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                Status
+              </label>
+              <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as TaskStatus)}
                 className={`w-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-2xl px-3 py-2.5 focus:outline-none focus:ring-2 ${accent.ring}`}
@@ -137,24 +123,28 @@ export const NewTaskModal: React.FC<NewTaskModalProps> = ({
               </select>
             </div>
           </div>
-
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Assignee</label>
-              <select 
+              <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                Assignee
+              </label>
+              <select
                 value={assigneeId}
                 onChange={(e) => setAssigneeId(e.target.value)}
                 className={`w-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-2xl px-3 py-2.5 focus:outline-none focus:ring-2 ${accent.ring}`}
               >
-                {users.map(u => (
-                  <option key={u.id} value={u.id}>{u.name}</option>
+                {users.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.name}
+                  </option>
                 ))}
               </select>
             </div>
-
             <div className="space-y-1">
-              <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Due Date</label>
-              <input 
+              <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                Due Date
+              </label>
+              <input
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
@@ -162,14 +152,12 @@ export const NewTaskModal: React.FC<NewTaskModalProps> = ({
               />
             </div>
           </div>
-
-          {/* Tags Selection */}
           <div className="space-y-2">
             <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
               <TagIcon className="h-3.5 w-3.5" /> Select Tags
             </label>
             <div className="flex flex-wrap gap-1.5">
-              {tags.map(tag => {
+              {tags.map((tag) => {
                 const isSelected = selectedTagIds.includes(tag.id);
                 return (
                   <button
@@ -177,9 +165,9 @@ export const NewTaskModal: React.FC<NewTaskModalProps> = ({
                     type="button"
                     onClick={() => handleToggleTag(tag.id)}
                     className={`text-xs font-bold px-3 py-1.5 rounded-xl border transition-all ${
-                      isSelected 
-                        ? `${tagColorMap[tag.color]} border-indigo-500/40 ring-2 ring-indigo-500/20` 
-                        : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                      isSelected
+                        ? `${tagColorMap[tag.color]} border-indigo-500/40 ring-2 ring-indigo-500/20`
+                        : "bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50"
                     }`}
                   >
                     {tag.name}
@@ -188,8 +176,10 @@ export const NewTaskModal: React.FC<NewTaskModalProps> = ({
               })}
             </div>
           </div>
-
-          <Button type="submit" className={`w-full ${accent.bg} ${accent.bgHover} text-white rounded-2xl py-3 font-bold mt-4 shadow-lg ${accent.shadowFab}`}>
+          <Button
+            type="submit"
+            className={`w-full ${accent.bg} ${accent.bgHover} text-white rounded-2xl py-3 font-bold mt-4 shadow-lg ${accent.shadowFab}`}
+          >
             Create Task
           </Button>
         </form>

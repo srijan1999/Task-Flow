@@ -1,33 +1,23 @@
-import React, { useState } from 'react';
-import { User, Workspace, Tag, AccentColor, accentColorMap } from '../types/task';
-import { 
-  Sparkles, 
-  Smartphone, 
-  TrendingUp, 
-  Plus, 
-  Radio, 
-  Layers,
-  CheckSquare,
-  UserCheck,
-  Settings,
-  Moon,
+import React, { useState } from "react";
+import { Workspace, Tag, AccentColor, accentColorMap } from "../types/task";
+import {
+  Sparkles,
+  Smartphone,
+  TrendingUp,
+  Plus,
   Tag as TagIcon,
   Trash2,
-  Palette
-} from 'lucide-react';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
+  Palette,
+  Moon,
+} from "lucide-react";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 
 interface WorkspaceSidebarProps {
   workspaces: Workspace[];
   activeWorkspace: Workspace;
   setActiveWorkspace: (workspace: Workspace) => void;
-  users: User[];
-  currentUser: User;
-  setCurrentUser: (user: User) => void;
-  isSimulating: boolean;
-  setIsSimulating: (simulating: boolean) => void;
   onAddWorkspace: (name: string, description: string) => void;
   isDarkMode: boolean;
   onToggleDarkMode: () => void;
@@ -44,36 +34,31 @@ const iconMap: Record<string, React.ComponentType<any>> = {
   TrendingUp,
 };
 
-const tagColors = ['indigo', 'rose', 'emerald', 'amber', 'sky', 'violet', 'fuchsia'];
+const tagColors = ["indigo", "rose", "emerald", "amber", "sky", "violet", "fuchsia"];
 
 const tagColorMap: Record<string, string> = {
-  indigo: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20',
-  rose: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
-  emerald: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
-  amber: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
-  sky: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20',
-  violet: 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20',
-  fuchsia: 'bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400 border-fuchsia-500/20',
+  indigo: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20",
+  rose: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20",
+  emerald: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+  amber: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+  sky: "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20",
+  violet: "bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20",
+  fuchsia: "bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400 border-fuchsia-500/20",
 };
 
 const accentColors: { id: AccentColor; name: string; hex: string }[] = [
-  { id: 'indigo', name: 'Indigo', hex: '#6366f1' },
-  { id: 'emerald', name: 'Emerald', hex: '#10b981' },
-  { id: 'rose', name: 'Rose', hex: '#f43f5e' },
-  { id: 'amber', name: 'Amber', hex: '#f59e0b' },
-  { id: 'violet', name: 'Violet', hex: '#8b5cf6' },
-  { id: 'sky', name: 'Sky', hex: '#0ea5e9' },
+  { id: "indigo", name: "Indigo", hex: "#6366f1" },
+  { id: "emerald", name: "Emerald", hex: "#10b981" },
+  { id: "rose", name: "Rose", hex: "#f43f5e" },
+  { id: "amber", name: "Amber", hex: "#f59e0b" },
+  { id: "violet", name: "Violet", hex: "#8b5cf6" },
+  { id: "sky", name: "Sky", hex: "#0ea5e9" },
 ];
 
 export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
   workspaces,
   activeWorkspace,
   setActiveWorkspace,
-  users,
-  currentUser,
-  setCurrentUser,
-  isSimulating,
-  setIsSimulating,
   onAddWorkspace,
   isDarkMode,
   onToggleDarkMode,
@@ -83,13 +68,11 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
   accentColor,
   onAccentColorChange,
 }) => {
-  const [newWorkspaceName, setNewWorkspaceName] = useState('');
-  const [newWorkspaceDesc, setNewWorkspaceDesc] = useState('');
+  const [newWorkspaceName, setNewWorkspaceName] = useState("");
+  const [newWorkspaceDesc, setNewWorkspaceDesc] = useState("");
   const [isAddOpen, setIsAddOpen] = useState(false);
-
-  // Tag creation state
-  const [newTagName, setNewTagName] = useState('');
-  const [selectedColor, setSelectedColor] = useState('indigo');
+  const [newTagName, setNewTagName] = useState("");
+  const [selectedColor, setSelectedColor] = useState("indigo");
 
   const accent = accentColorMap[accentColor];
 
@@ -97,8 +80,8 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
     e.preventDefault();
     if (!newWorkspaceName.trim()) return;
     onAddWorkspace(newWorkspaceName, newWorkspaceDesc);
-    setNewWorkspaceName('');
-    setNewWorkspaceDesc('');
+    setNewWorkspaceName("");
+    setNewWorkspaceDesc("");
     setIsAddOpen(false);
   };
 
@@ -106,46 +89,54 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
     e.preventDefault();
     if (!newTagName.trim()) return;
     onAddTag(newTagName, selectedColor);
-    setNewTagName('');
+    setNewTagName("");
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50 dark:bg-slate-950 select-none transition-colors duration-200">
+    <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-white dark:bg-slate-900 transition-colors duration-200">
       {/* Workspaces Section */}
       <div>
         <div className="flex items-center justify-between mb-3 px-1">
-          <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Workspaces</span>
+          <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+            Workspaces
+          </span>
           <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
             <DialogTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full">
-                <Plus className="h-4.5 w-4.5" />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full"
+              >
+                <Plus className="h-4 w-4" />
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-slate-900 text-white border-slate-800 max-w-xs rounded-3xl">
+            <DialogContent className="bg-slate-900 text-white border-slate-800 max-w-sm rounded-3xl">
               <DialogHeader>
                 <DialogTitle className="text-lg font-extrabold">Create Workspace</DialogTitle>
               </DialogHeader>
               <form onSubmit={handleCreateWorkspace} className="space-y-4 mt-2">
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-300">Workspace Name</label>
-                  <Input 
+                  <Input
                     value={newWorkspaceName}
                     onChange={(e) => setNewWorkspaceName(e.target.value)}
                     placeholder="e.g., Marketing Launch"
                     className={`bg-slate-800 border-slate-700 text-white ${accent.ring} rounded-xl`}
-                    required
                   />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-300">Description</label>
-                  <Input 
+                  <Input
                     value={newWorkspaceDesc}
                     onChange={(e) => setNewWorkspaceDesc(e.target.value)}
                     placeholder="Brief description"
                     className={`bg-slate-800 border-slate-700 text-white ${accent.ring} rounded-xl`}
                   />
                 </div>
-                <Button type="submit" className={`w-full ${accent.bg} ${accent.bgHover} text-white rounded-xl font-bold`}>
+                <Button
+                  type="submit"
+                  className={`w-full ${accent.bg} ${accent.bgHover} text-white rounded-xl font-bold`}
+                >
                   Create Workspace
                 </Button>
               </form>
@@ -155,23 +146,27 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
 
         <div className="space-y-2">
           {workspaces.map((ws) => {
-            const IconComponent = iconMap[ws.icon] || CheckSquare;
+            const IconComponent = iconMap[ws.icon] || Sparkles;
             const isActive = ws.id === activeWorkspace.id;
             return (
               <button
                 key={ws.id}
                 onClick={() => setActiveWorkspace(ws)}
-                className={`w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-sm font-bold transition-all duration-200 ${
-                  isActive 
-                    ? `${accent.bg} text-white shadow-md ${accent.shadow}` 
-                    : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white border border-slate-100 dark:border-slate-800 shadow-sm'
+                className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-bold transition-all duration-200 ${
+                  isActive
+                    ? `${accent.bg} text-white shadow-md ${accent.shadow}`
+                    : "bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white border border-slate-100 dark:border-slate-800"
                 }`}
               >
-                <IconComponent className={`h-4.5 w-4.5 ${isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500'}`} />
+                <IconComponent
+                  className={`h-4 w-4 ${isActive ? "text-white" : "text-slate-400 dark:text-slate-500"}`}
+                />
                 <div className="text-left min-w-0 flex-1">
                   <p className="truncate leading-none">{ws.name}</p>
                   {!isActive && ws.description && (
-                    <p className="text-[10px] text-slate-400 dark:text-slate-500 truncate mt-1 font-medium">{ws.description}</p>
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500 truncate mt-1 font-medium">
+                      {ws.description}
+                    </p>
                   )}
                 </div>
               </button>
@@ -184,45 +179,55 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
       <div>
         <div className="mb-3 flex items-center gap-2 px-1">
           <TagIcon className="h-4 w-4 text-slate-500 dark:text-slate-400" />
-          <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Custom Task Tags</span>
+          <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+            Custom Task Tags
+          </span>
         </div>
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-100 dark:border-slate-800 shadow-sm space-y-4 transition-colors duration-200">
-          {/* Tag Creation Form */}
+        <div className="bg-slate-50 dark:bg-slate-950 rounded-2xl p-4 border border-slate-100 dark:border-slate-800 space-y-4 transition-colors duration-200">
           <form onSubmit={handleCreateTag} className="space-y-3">
             <div className="flex gap-1.5">
-              <Input 
+              <Input
                 value={newTagName}
                 onChange={(e) => setNewTagName(e.target.value)}
                 placeholder="New tag name..."
-                className={`flex-1 border-slate-200 dark:border-slate-800 bg-transparent dark:text-slate-200 ${accent.ring} rounded-xl text-xs h-9`}
-                required
+                className={`flex-1 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 ${accent.ring} rounded-xl text-xs h-9`}
               />
-              <Button type="submit" className={`${accent.bg} ${accent.bgHover} text-white rounded-xl text-xs h-9 px-3`}>
+              <Button
+                type="submit"
+                className={`${accent.bg} ${accent.bgHover} text-white rounded-xl text-xs h-9 px-3`}
+              >
                 Add Tag
               </Button>
             </div>
-            {/* Color Picker */}
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Tag Color</span>
+              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                Tag Color
+              </span>
               <div className="flex gap-1.5">
-                {tagColors.map(color => (
+                {tagColors.map((color) => (
                   <button
                     key={color}
                     type="button"
                     onClick={() => setSelectedColor(color)}
                     className={`h-5 w-5 rounded-full border transition-all ${
-                      selectedColor === color 
-                        ? `ring-2 ring-offset-2 dark:ring-offset-slate-900 scale-110` 
-                        : 'opacity-70 hover:opacity-100'
+                      selectedColor === color ? "ring-2 ring-offset-2 dark:ring-offset-slate-900 scale-110" : "opacity-70 hover:opacity-100"
                     }`}
                     style={{
-                      borderColor: selectedColor === color ? '#6366f1' : 'transparent',
-                      backgroundColor: color === 'indigo' ? '#6366f1' : 
-                                       color === 'rose' ? '#f43f5e' : 
-                                       color === 'emerald' ? '#10b981' : 
-                                       color === 'amber' ? '#f59e0b' : 
-                                       color === 'sky' ? '#0ea5e9' : 
-                                       color === 'violet' ? '#8b5cf6' : '#d946ef'
+                      borderColor: selectedColor === color ? "#6366f1" : "transparent",
+                      backgroundColor:
+                        color === "indigo"
+                          ? "#6366f1"
+                          : color === "rose"
+                          ? "#f43f5e"
+                          : color === "emerald"
+                          ? "#10b981"
+                          : color === "amber"
+                          ? "#f59e0b"
+                          : color === "sky"
+                          ? "#0ea5e9"
+                          : color === "violet"
+                          ? "#8b5cf6"
+                          : "#d946ef",
                     }}
                   />
                 ))}
@@ -230,17 +235,20 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
             </div>
           </form>
 
-          {/* Tags List */}
           <div className="border-t border-slate-100 dark:border-slate-800 pt-3 space-y-2">
-            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Existing Tags</span>
+            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
+              Existing Tags
+            </span>
             <div className="flex flex-wrap gap-1.5 max-h-[120px] overflow-y-auto pr-1">
-              {tags.map(tag => (
-                <div 
-                  key={tag.id} 
-                  className={`flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-xl border ${tagColorMap[tag.color] || 'bg-slate-500/10 text-slate-600 border-slate-500/20'}`}
+              {tags.map((tag) => (
+                <div
+                  key={tag.id}
+                  className={`flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-xl border ${
+                    tagColorMap[tag.color] || "bg-slate-500/10 text-slate-600 border-slate-500/20"
+                  }`}
                 >
                   <span>{tag.name}</span>
-                  <button 
+                  <button
                     type="button"
                     onClick={() => onDeleteTag(tag.id)}
                     className="text-slate-400 hover:text-rose-500 transition-colors"
@@ -257,56 +265,15 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
         </div>
       </div>
 
-      {/* Active Identity Switcher */}
-      <div>
-        <div className="mb-3 flex items-center gap-2 px-1">
-          <UserCheck className="h-4 w-4 text-slate-500 dark:text-slate-400" />
-          <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Active Identity</span>
-        </div>
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-100 dark:border-slate-800 shadow-sm space-y-3 transition-colors duration-200">
-          <p className="text-[11px] text-slate-400 dark:text-slate-500 leading-relaxed font-medium">
-            Switch users below to simulate collaborative actions from different perspectives:
-          </p>
-          <div className="space-y-2">
-            {users.map((u) => {
-              const isMe = u.id === currentUser.id;
-              return (
-                <button
-                  key={u.id}
-                  onClick={() => setCurrentUser(u)}
-                  className={`w-full flex items-center justify-between p-2.5 rounded-xl text-xs font-bold transition-all ${
-                    isMe 
-                      ? `${accent.bgLight} ${accent.bgLightDark} border ${accent.border} ${accent.borderDark} ${accent.text} ${accent.textDark}` 
-                      : 'border border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-800 dark:hover:text-white'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <img src={u.avatar} alt={u.name} className="h-7 w-7 rounded-full object-cover border border-slate-200 dark:border-slate-700" />
-                    <div className="text-left">
-                      <p className="font-extrabold">{u.name}</p>
-                      <p className="text-[9px] text-slate-400 dark:text-slate-500 font-medium">{u.role}</p>
-                    </div>
-                  </div>
-                  {isMe && (
-                    <span className={`${accent.bgLight} ${accent.bgLightDark} ${accent.text} ${accent.textDark} text-[8px] px-2 py-0.5 rounded-full font-extrabold uppercase tracking-wider`}>
-                      You
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
       {/* App Settings Section */}
       <div>
         <div className="mb-3 flex items-center gap-2 px-1">
-          <Settings className="h-4 w-4 text-slate-500 dark:text-slate-400" />
-          <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">App Settings</span>
+          <Palette className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+          <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+            App Settings
+          </span>
         </div>
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-100 dark:border-slate-800 shadow-sm space-y-4 transition-colors duration-200">
-          {/* Accent Color Selector */}
+        <div className="bg-slate-50 dark:bg-slate-950 rounded-2xl p-4 border border-slate-100 dark:border-slate-800 space-y-4 transition-colors duration-200">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Palette className="h-4 w-4 text-slate-500 dark:text-slate-400" />
@@ -318,13 +285,13 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                   key={color.id}
                   onClick={() => onAccentColorChange(color.id)}
                   className={`h-6 w-6 rounded-full border transition-all ${
-                    accentColor === color.id 
-                      ? 'ring-2 ring-offset-2 dark:ring-offset-slate-900 scale-110' 
-                      : 'opacity-70 hover:opacity-100'
+                    accentColor === color.id
+                      ? "ring-2 ring-offset-2 dark:ring-offset-slate-900 scale-110"
+                      : "opacity-70 hover:opacity-100"
                   }`}
                   style={{
                     backgroundColor: color.hex,
-                    borderColor: accentColor === color.id ? color.hex : 'transparent'
+                    borderColor: accentColor === color.id ? color.hex : "transparent",
                   }}
                   title={color.name}
                 />
@@ -332,7 +299,6 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
             </div>
           </div>
 
-          {/* Dark Mode Switch */}
           <div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-3">
             <div className="flex items-center gap-2">
               <Moon className="h-4 w-4 text-slate-500 dark:text-slate-400" />
@@ -341,39 +307,16 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
             <button
               onClick={onToggleDarkMode}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none ${
-                isDarkMode ? accent.bg : 'bg-slate-200 dark:bg-slate-800'
+                isDarkMode ? accent.bg : "bg-slate-200 dark:bg-slate-800"
               }`}
             >
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${
-                  isDarkMode ? 'translate-x-6' : 'translate-x-1'
+                  isDarkMode ? "translate-x-6" : "translate-x-1"
                 }`}
               />
             </button>
           </div>
-
-          {/* Live Simulation Toggle */}
-          <div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-3">
-            <div className="flex items-center gap-2">
-              <Radio className={`h-4 w-4 ${isSimulating ? 'text-emerald-500 animate-pulse' : 'text-slate-500 dark:text-slate-400'}`} />
-              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Simulate Activity</span>
-            </div>
-            <button
-              onClick={() => setIsSimulating(!isSimulating)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none ${
-                isSimulating ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-800'
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${
-                  isSimulating ? 'translate-x-6' : 'translate-x-1'
-                }`}
-              />
-            </button>
-          </div>
-          <p className="text-[11px] text-slate-400 dark:text-slate-500 leading-relaxed font-medium">
-            When enabled, other team members will periodically perform actions (move tasks, add comments, complete subtasks) in real-time.
-          </p>
         </div>
       </div>
     </div>
