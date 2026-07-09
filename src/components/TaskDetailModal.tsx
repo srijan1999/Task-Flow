@@ -116,19 +116,19 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
       <div className="absolute inset-0" onClick={onClose} />
 
       {/* Android Bottom Sheet Container */}
-      <div className="bg-white rounded-t-[32px] w-full max-w-md shadow-2xl border-t border-slate-100 flex flex-col max-h-[85vh] overflow-hidden animate-in slide-in-from-bottom duration-300 relative z-10">
+      <div className="bg-white dark:bg-slate-900 rounded-t-[32px] w-full max-w-md shadow-2xl border-t border-slate-100 dark:border-slate-800 flex flex-col max-h-[85vh] overflow-hidden animate-in slide-in-from-bottom duration-300 relative z-10 transition-colors duration-200">
         
         {/* Android Drag Handle */}
         <div className="w-full flex justify-center py-3 shrink-0">
-          <div className="w-12 h-1.5 bg-slate-200 rounded-full" />
+          <div className="w-12 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full" />
         </div>
 
         {/* Header */}
-        <div className="px-6 pb-4 border-b border-slate-100 flex items-center justify-between">
+        <div className="px-6 pb-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Task Details</span>
-            <span className="text-slate-300">•</span>
-            <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">
+            <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Task Details</span>
+            <span className="text-slate-300 dark:text-slate-700">•</span>
+            <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 px-2 py-0.5 rounded-full">
               ID: {task.id}
             </span>
           </div>
@@ -141,11 +141,11 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                   onDeleteTask(task.id);
                 }
               }}
-              className="text-rose-500 hover:text-rose-600 hover:bg-rose-50 rounded-full h-9 w-9"
+              className="text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-full h-9 w-9"
             >
               <Trash2 className="h-4.5 w-4.5" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full h-9 w-9">
+            <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full h-9 w-9 text-slate-500 dark:text-slate-400">
               <X className="h-4.5 w-4.5" />
             </Button>
           </div>
@@ -164,12 +164,12 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                 onUpdateTask({ ...task, title: e.target.value });
               }}
               onBlur={handleSave}
-              className="w-full text-xl font-extrabold text-slate-800 border-b border-transparent hover:border-slate-200 focus:border-indigo-500 focus:outline-none pb-1 transition-colors"
+              className="w-full text-xl font-extrabold text-slate-800 dark:text-slate-100 bg-transparent border-b border-transparent hover:border-slate-200 dark:hover:border-slate-800 focus:border-indigo-500 focus:outline-none pb-1 transition-colors"
               placeholder="Task Title"
             />
             
             <div className="space-y-1">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Description</label>
+              <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Description</label>
               <Textarea 
                 value={description}
                 onChange={(e) => {
@@ -178,16 +178,16 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                 }}
                 onBlur={handleSave}
                 placeholder="Add a detailed description..."
-                className="min-h-[80px] text-sm resize-none border-slate-200 focus:ring-indigo-500 rounded-2xl"
+                className="min-h-[80px] text-sm resize-none border-slate-200 dark:border-slate-800 bg-transparent dark:text-slate-200 focus:ring-indigo-500 rounded-2xl"
               />
             </div>
           </div>
 
           {/* Metadata Grid */}
-          <div className="grid grid-cols-2 gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+          <div className="grid grid-cols-2 gap-3 bg-slate-50 dark:bg-slate-950/50 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-800">
             {/* Status */}
             <div className="space-y-1">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
                 <Clock className="h-3 w-3" /> Status
               </span>
               <select 
@@ -197,7 +197,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                   setStatus(val);
                   onUpdateTask({ ...task, status: val });
                 }}
-                className="w-full text-xs font-bold bg-white border border-slate-200 rounded-xl px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="todo">To Do</option>
                 <option value="in_progress">In Progress</option>
@@ -208,7 +208,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
 
             {/* Priority */}
             <div className="space-y-1">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
                 <Tag className="h-3 w-3" /> Priority
               </span>
               <select 
@@ -218,7 +218,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                   setPriority(val);
                   onUpdateTask({ ...task, priority: val });
                 }}
-                className="w-full text-xs font-bold bg-white border border-slate-200 rounded-xl px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
@@ -228,7 +228,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
 
             {/* Assignee */}
             <div className="space-y-1">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
                 <UserIcon className="h-3 w-3" /> Assignee
               </span>
               <select 
@@ -237,7 +237,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                   setAssigneeId(e.target.value);
                   onUpdateTask({ ...task, assigneeId: e.target.value });
                 }}
-                className="w-full text-xs font-bold bg-white border border-slate-200 rounded-xl px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 {users.map(u => (
                   <option key={u.id} value={u.id}>{u.name}</option>
@@ -247,7 +247,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
 
             {/* Due Date */}
             <div className="space-y-1">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
                 <Calendar className="h-3 w-3" /> Due Date
               </span>
               <input 
@@ -257,28 +257,28 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                   setDueDate(e.target.value);
                   onUpdateTask({ ...task, dueDate: e.target.value });
                 }}
-                className="w-full text-xs font-bold bg-white border border-slate-200 rounded-xl px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-xl px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
           </div>
 
           {/* Subtasks Section */}
           <div className="space-y-2.5">
-            <h5 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+            <h5 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
               <CheckSquare className="h-3.5 w-3.5" /> Subtasks
             </h5>
             
             <div className="space-y-1.5 max-h-[150px] overflow-y-auto pr-1">
               {task.subtasks.map(sub => (
-                <div key={sub.id} className="flex items-center justify-between bg-slate-50/50 hover:bg-slate-50 p-2 rounded-xl border border-slate-100 transition-colors">
+                <div key={sub.id} className="flex items-center justify-between bg-slate-50/50 dark:bg-slate-950/30 hover:bg-slate-50 dark:hover:bg-slate-950/80 p-2 rounded-xl border border-slate-100 dark:border-slate-800 transition-colors">
                   <label className="flex items-center gap-2.5 cursor-pointer flex-1">
                     <input 
                       type="checkbox"
                       checked={sub.completed}
                       onChange={() => handleToggleSubtask(sub.id)}
-                      className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                      className="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500 bg-transparent"
                     />
-                    <span className={`text-xs font-semibold ${sub.completed ? 'line-through text-slate-400' : 'text-slate-700'}`}>
+                    <span className={`text-xs font-semibold ${sub.completed ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-700 dark:text-slate-200'}`}>
                       {sub.title}
                     </span>
                   </label>
@@ -286,7 +286,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                     variant="ghost" 
                     size="icon" 
                     onClick={() => handleDeleteSubtask(sub.id)}
-                    className="h-6 w-6 text-slate-400 hover:text-rose-500 rounded-lg"
+                    className="h-6 w-6 text-slate-400 dark:text-slate-500 hover:text-rose-500 rounded-lg"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
@@ -299,7 +299,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                 value={newSubtask}
                 onChange={(e) => setNewSubtask(e.target.value)}
                 placeholder="Add subtask..."
-                className="flex-1 border-slate-200 focus:ring-indigo-500 rounded-xl text-xs h-9"
+                className="flex-1 border-slate-200 dark:border-slate-800 bg-transparent dark:text-slate-200 focus:ring-indigo-500 rounded-xl text-xs h-9"
               />
               <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs h-9 px-3">
                 Add
@@ -309,19 +309,19 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
 
           {/* Comments Section */}
           <div className="space-y-3 pt-1">
-            <h5 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+            <h5 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
               <MessageSquare className="h-3.5 w-3.5" /> Discussion
             </h5>
 
             {/* Comment Input */}
             <form onSubmit={handleAddComment} className="flex gap-2 items-center">
-              <img src={currentUser.avatar} alt={currentUser.name} className="h-7 w-7 rounded-full object-cover border border-slate-200" />
+              <img src={currentUser.avatar} alt={currentUser.name} className="h-7 w-7 rounded-full object-cover border border-slate-200 dark:border-slate-700" />
               <div className="flex-1 flex gap-1.5">
                 <Input 
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   placeholder="Write a comment..."
-                  className="flex-1 border-slate-200 focus:ring-indigo-500 rounded-xl text-xs h-9"
+                  className="flex-1 border-slate-200 dark:border-slate-800 bg-transparent dark:text-slate-200 focus:ring-indigo-500 rounded-xl text-xs h-9"
                 />
                 <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl h-9 w-9 p-0 shrink-0">
                   <Send className="h-3.5 w-3.5" />
@@ -332,19 +332,19 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
             {/* Comments List */}
             <div className="space-y-2 max-h-[150px] overflow-y-auto pr-1">
               {task.comments.map(comment => (
-                <div key={comment.id} className="flex gap-2 items-start bg-slate-50/30 p-2.5 rounded-xl border border-slate-100">
-                  <img src={comment.userAvatar} alt={comment.userName} className="h-6 w-6 rounded-full object-cover border border-slate-200" />
+                <div key={comment.id} className="flex gap-2 items-start bg-slate-50/30 dark:bg-slate-950/20 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800">
+                  <img src={comment.userAvatar} alt={comment.userName} className="h-6 w-6 rounded-full object-cover border border-slate-200 dark:border-slate-700" />
                   <div className="space-y-0.5 flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold text-slate-700">{comment.userName}</span>
-                      <span className="text-[9px] text-slate-400">{comment.createdAt}</span>
+                      <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300">{comment.userName}</span>
+                      <span className="text-[9px] text-slate-400 dark:text-slate-500">{comment.createdAt}</span>
                     </div>
-                    <p className="text-xs text-slate-600 leading-relaxed break-words">{comment.text}</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed break-words">{comment.text}</p>
                   </div>
                 </div>
               ))}
               {task.comments.length === 0 && (
-                <p className="text-[10px] text-slate-400 text-center py-2">No comments yet.</p>
+                <p className="text-[10px] text-slate-400 dark:text-slate-500 text-center py-2">No comments yet.</p>
               )}
             </div>
           </div>

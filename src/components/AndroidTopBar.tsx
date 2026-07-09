@@ -1,17 +1,21 @@
 import React from 'react';
-import { Search, Wifi, Battery, Signal, Sparkles } from 'lucide-react';
+import { Search, Wifi, Battery, Signal, Sparkles, Sun, Moon } from 'lucide-react';
 import { User, Workspace } from '../types/task';
 
 interface AndroidTopBarProps {
   activeWorkspace: Workspace;
   currentUser: User;
   onSearchClick: () => void;
+  isDarkMode: boolean;
+  onToggleDarkMode: () => void;
 }
 
 export const AndroidTopBar: React.FC<AndroidTopBarProps> = ({
   activeWorkspace,
   currentUser,
   onSearchClick,
+  isDarkMode,
+  onToggleDarkMode,
 }) => {
   // Get current time for simulated status bar
   const [time, setTime] = React.useState('');
@@ -48,13 +52,20 @@ export const AndroidTopBar: React.FC<AndroidTopBarProps> = ({
             <h1 className="font-bold text-base tracking-tight text-slate-100">
               {activeWorkspace.name}
             </h1>
-            <p className="text-[11px] text-slate-400 font-medium truncate max-w-[180px]">
+            <p className="text-[11px] text-slate-400 font-medium truncate max-w-[150px]">
               {activeWorkspace.description || 'Collaborative Workspace'}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
+          <button 
+            onClick={onToggleDarkMode}
+            className="p-2 hover:bg-slate-800 rounded-full text-slate-300 transition-colors"
+            title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          >
+            {isDarkMode ? <Sun className="h-5 w-5 text-amber-400" /> : <Moon className="h-5 w-5 text-slate-300" />}
+          </button>
           <button 
             onClick={onSearchClick}
             className="p-2 hover:bg-slate-800 rounded-full text-slate-300 transition-colors"
@@ -64,7 +75,7 @@ export const AndroidTopBar: React.FC<AndroidTopBarProps> = ({
           <img 
             src={currentUser.avatar} 
             alt={currentUser.name} 
-            className="h-8 w-8 rounded-full object-cover ring-2 ring-indigo-500/40"
+            className="h-8 w-8 rounded-full object-cover ring-2 ring-indigo-500/40 ml-1"
             title={`Logged in as ${currentUser.name}`}
           />
         </div>

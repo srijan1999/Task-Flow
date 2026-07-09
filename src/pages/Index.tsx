@@ -52,6 +52,12 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   
+  // Dark Mode State
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    const saved = localStorage.getItem('cotask_dark_mode');
+    return saved ? JSON.parse(saved) : false;
+  });
+  
   // Android Navigation State
   const [activeTab, setActiveTab] = useState<AndroidTab>('board');
   const [activeColumn, setActiveColumn] = useState<TaskStatus>('todo');
@@ -72,6 +78,10 @@ const Index = () => {
   useEffect(() => {
     localStorage.setItem('cotask_activities', JSON.stringify(activities));
   }, [activities]);
+
+  useEffect(() => {
+    localStorage.setItem('cotask_dark_mode', JSON.stringify(isDarkMode));
+  }, [isDarkMode]);
 
   // Live Simulation Effect
   useEffect(() => {
@@ -334,13 +344,15 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-0 sm:p-4 font-sans">
       {/* Simulated Android Device Frame */}
-      <div className="w-full max-w-md h-screen sm:h-[840px] bg-slate-50 sm:rounded-[40px] sm:shadow-2xl border-0 sm:border-[10px] border-slate-900 overflow-hidden flex flex-col relative">
+      <div className={`w-full max-w-md h-screen sm:h-[840px] bg-slate-50 dark:bg-slate-950 sm:rounded-[40px] sm:shadow-2xl border-0 sm:border-[10px] border-slate-900 overflow-hidden flex flex-col relative transition-colors duration-200 ${isDarkMode ? 'dark' : ''}`}>
         
         {/* Android Top App Bar */}
         <AndroidTopBar 
           activeWorkspace={activeWorkspace}
           currentUser={currentUser}
           onSearchClick={() => setIsSearchOpen(!isSearchOpen)}
+          isDarkMode={isDarkMode}
+          onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
         />
 
         {/* Search Bar Overlay */}
@@ -415,12 +427,12 @@ const Index = () => {
                 ))}
                 {activeColumnTasks.length === 0 && (
                   <div className="flex flex-col items-center justify-center py-20 text-center px-6 space-y-3">
-                    <div className="bg-slate-100 p-4 rounded-full text-slate-400">
+                    <div className="bg-slate-100 dark:bg-slate-900 p-4 rounded-full text-slate-400 dark:text-slate-600 transition-colors">
                       <HelpCircle className="h-8 w-8" />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-slate-700">No tasks in this stage</p>
-                      <p className="text-xs text-slate-400 mt-1">Tap the FAB button below to create a new task.</p>
+                      <p className="text-sm font-bold text-slate-700 dark:text-slate-300">No tasks in this stage</p>
+                      <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Tap the FAB button below to create a new task.</p>
                     </div>
                   </div>
                 )}
@@ -439,6 +451,8 @@ const Index = () => {
               isSimulating={isSimulating}
               setIsSimulating={setIsSimulating}
               onAddWorkspace={handleAddWorkspace}
+              isDarkMode={isDarkMode}
+              onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
             />
           )}
 
