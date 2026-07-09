@@ -24,6 +24,12 @@ export interface Comment {
   createdAt: string;
 }
 
+export interface Tag {
+  id: string;
+  name: string;
+  color: string; // Tailwind color class prefix, e.g., 'emerald', 'rose', 'indigo'
+}
+
 export interface Task {
   id: string;
   title: string;
@@ -35,6 +41,7 @@ export interface Task {
   dueDate: string;
   subtasks: SubTask[];
   comments: Comment[];
+  tagIds?: string[]; // Array of Tag IDs assigned to this task
   createdAt: string;
 }
 

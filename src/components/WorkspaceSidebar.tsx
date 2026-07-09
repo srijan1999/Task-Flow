@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Workspace } from '../types/task';
+import { User, Workspace, Tag } from '../types/task';
 import { 
   Sparkles, 
   Smartphone, 
@@ -10,7 +10,9 @@ import {
   CheckSquare,
   UserCheck,
   Settings,
-  Moon
+  Moon,
+  Tag as TagIcon,
+  Trash2
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -28,12 +30,27 @@ interface WorkspaceSidebarProps {
   onAddWorkspace: (name: string, description: string) => void;
   isDarkMode: boolean;
   onToggleDarkMode: () => void;
+  tags: Tag[];
+  onAddTag: (name: string, color: string) => void;
+  onDeleteTag: (tagId: string) => void;
 }
 
 const iconMap: Record<string, React.ComponentType<any>> = {
   Sparkles,
   Smartphone,
   TrendingUp,
+};
+
+const tagColors = ['indigo', 'rose', 'emerald', 'amber', 'sky', 'violet', 'fuchsia'];
+
+const tagColorMap: Record<string, string> = {
+  indigo: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20',
+  rose: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
+  emerald: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+  amber: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+  sky: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20',
+  violet: 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20',
+  fuchsia: 'bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400 border-fuchsia-500/20',
 };
 
 export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
@@ -48,10 +65,17 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
   onAddWorkspace,
   isDarkMode,
   onToggleDarkMode,
+  tags,
+  onAddTag,
+  onDeleteTag,
 }) => {
   const [newWorkspaceName, setNewWorkspaceName] = useState('');
   const [newWorkspaceDesc, setNewWorkspaceDesc] = useState('');
   const [isAddOpen, setIsAddOpen] = useState(false);
+
+  // Tag creation state
+  const [newTagName, setNewTagName] = useState('');
+  const [selectedColor, setSelectedColor] = useState('indigo');
 
   const handleCreateWorkspace = (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,6 +84,13 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
     setNewWorkspaceName('');
     setNewWorkspaceDesc('');
     setIsAddOpen(false);
+  };
+
+  const handleCreateTag = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTagName.trim()) return;
+    onAddTag(newTagName, selectedColor);
+    setNewTagName('');
   };
 
   return (
@@ -130,6 +161,82 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
               </button>
             );
           })}
+        </div>
+      </div>
+
+      {/* Custom Task Tags Section */}
+      <div>
+        <div className="mb-3 flex items-center gap-2 px-1">
+          <TagIcon className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+          <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Custom Task Tags</span>
+        </div>
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-100 dark:border-slate-800 shadow-sm space-y-4 transition-colors duration-200">
+          {/* Tag Creation Form */}
+          <form onSubmit={handleCreateTag} className="space-y-3">
+            <div className="flex gap-1.5">
+              <Input 
+                value={newTagName}
+                onChange={(e) => setNewTagName(e.target.value)}
+                placeholder="New tag name..."
+                className="flex-1 border-slate-200 dark:border-slate-800 bg-transparent dark:text-slate-200 focus:ring-indigo-500 rounded-xl text-xs h-9"
+                required
+              />
+              <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs h-9 px-3">
+                Add Tag
+              </Button>
+            </div>
+            {/* Color Picker */}
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Tag Color</span>
+              <div className="flex gap-1.5">
+                {tagColors.map(color => (
+                  <button
+                    key={color}
+                    type="button"
+                    onClick={() => setSelectedColor(color)}
+                    className={`h-5 w-5 rounded-full border transition-all ${
+                      selectedColor === color 
+                        ? 'ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-slate-900 scale-110' 
+                        : 'opacity-70 hover:opacity-100'
+                    } bg-${color}-500`}
+                    style={{
+                      backgroundColor: color === 'indigo' ? '#6366f1' : 
+                                       color === 'rose' ? '#f43f5e' : 
+                                       color === 'emerald' ? '#10b981' : 
+                                       color === 'amber' ? '#f59e0b' : 
+                                       color === 'sky' ? '#0ea5e9' : 
+                                       color === 'violet' ? '#8b5cf6' : '#d946ef'
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          </form>
+
+          {/* Tags List */}
+          <div className="border-t border-slate-100 dark:border-slate-800 pt-3 space-y-2">
+            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Existing Tags</span>
+            <div className="flex flex-wrap gap-1.5 max-h-[120px] overflow-y-auto pr-1">
+              {tags.map(tag => (
+                <div 
+                  key={tag.id} 
+                  className={`flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-xl border ${tagColorMap[tag.color] || 'bg-slate-500/10 text-slate-600 border-slate-500/20'}`}
+                >
+                  <span>{tag.name}</span>
+                  <button 
+                    type="button"
+                    onClick={() => onDeleteTag(tag.id)}
+                    className="text-slate-400 hover:text-rose-500 transition-colors"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+              {tags.length === 0 && (
+                <p className="text-[10px] text-slate-400 dark:text-slate-500">No tags created yet.</p>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 

@@ -1,19 +1,31 @@
 import React, { useState } from 'react';
-import { Task, User, Priority, TaskStatus } from '../types/task';
-import { X } from 'lucide-react';
+import { Task, User, Priority, TaskStatus, Tag } from '../types/task';
+import { X, Tag as TagIcon } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 
 interface NewTaskModalProps {
   users: User[];
+  tags: Tag[];
   workspaceId: string;
   onClose: () => void;
   onAddTask: (task: Omit<Task, 'id' | 'comments' | 'createdAt'>) => void;
 }
 
+const tagColorMap: Record<string, string> = {
+  indigo: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20',
+  rose: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
+  emerald: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+  amber: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+  sky: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20',
+  violet: 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20',
+  fuchsia: 'bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400 border-fuchsia-500/20',
+};
+
 export const NewTaskModal: React.FC<NewTaskModalProps> = ({
   users,
+  tags,
   workspaceId,
   onClose,
   onAddTask,
@@ -24,6 +36,7 @@ export const NewTaskModal: React.FC<NewTaskModalProps> = ({
   const [status, setStatus] = useState<TaskStatus>('todo');
   const [assigneeId, setAssigneeId] = useState(users[0]?.id || '');
   const [dueDate, setDueDate] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,8 +51,15 @@ export const NewTaskModal: React.FC<NewTaskModalProps> = ({
       workspaceId,
       dueDate,
       subtasks: [],
+      tagIds: selectedTagIds,
     });
     onClose();
+  };
+
+  const handleToggleTag = (tagId: string) => {
+    setSelectedTagIds(prev => 
+      prev.includes(tagId) ? prev.filter(id => id !== tagId) : [...prev, tagId]
+    );
   };
 
   return (
@@ -137,6 +157,32 @@ export const NewTaskModal: React.FC<NewTaskModalProps> = ({
                 onChange={(e) => setDueDate(e.target.value)}
                 className="w-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-2xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
+            </div>
+          </div>
+
+          {/* Tags Selection */}
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
+              <TagIcon className="h-3.5 w-3.5" /> Select Tags
+            </label>
+            <div className="flex flex-wrap gap-1.5">
+              {tags.map(tag => {
+                const isSelected = selectedTagIds.includes(tag.id);
+                return (
+                  <button
+                    key={tag.id}
+                    type="button"
+                    onClick={() => handleToggleTag(tag.id)}
+                    className={`text-xs font-bold px-3 py-1.5 rounded-xl border transition-all ${
+                      isSelected 
+                        ? `${tagColorMap[tag.color]} border-indigo-500/40 ring-2 ring-indigo-500/20` 
+                        : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                    }`}
+                  >
+                    {tag.name}
+                  </button>
+                );
+              })}
             </div>
           </div>
 

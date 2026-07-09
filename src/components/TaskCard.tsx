@@ -1,5 +1,5 @@
 import React from 'react';
-import { Task, User } from '../types/task';
+import { Task, User, Tag } from '../types/task';
 import { 
   Calendar, 
   CheckSquare, 
@@ -11,6 +11,7 @@ import { Badge } from './ui/badge';
 interface TaskCardProps {
   task: Task;
   users: User[];
+  tags: Tag[];
   onClick: () => void;
   onMoveStatus: (taskId: string, direction: 'left' | 'right') => void;
 }
@@ -21,12 +22,26 @@ const priorityColors = {
   high: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
 };
 
-export const TaskCard: React.FC<TaskCardProps> = ({ task, users, onClick, onMoveStatus }) => {
+// Map tag color names to Tailwind classes
+const tagColorMap: Record<string, string> = {
+  indigo: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20',
+  rose: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
+  emerald: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+  amber: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+  sky: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20',
+  violet: 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20',
+  fuchsia: 'bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400 border-fuchsia-500/20',
+};
+
+export const TaskCard: React.FC<TaskCardProps> = ({ task, users, tags, onClick, onMoveStatus }) => {
   const assignee = users.find(u => u.id === task.assigneeId);
   
   const completedSubtasks = task.subtasks.filter(s => s.completed).length;
   const totalSubtasks = task.subtasks.length;
   const progressPercentage = totalSubtasks > 0 ? Math.round((completedSubtasks / totalSubtasks) * 100) : 0;
+
+  // Get tags assigned to this task
+  const assignedTags = tags.filter(t => task.tagIds?.includes(t.id));
 
   return (
     <div 
@@ -35,9 +50,20 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, users, onClick, onMove
     >
       {/* Top Row: Priority & Quick Actions */}
       <div className="flex items-center justify-between">
-        <Badge variant="outline" className={`capitalize font-bold text-[10px] px-2 py-0.5 rounded-full ${priorityColors[task.priority]}`}>
-          {task.priority}
-        </Badge>
+        <div className="flex items-center gap-1.5 flex-wrap max-w-[70%]">
+          <Badge variant="outline" className={`capitalize font-bold text-[9px] px-2 py-0.5 rounded-full ${priorityColors[task.priority]}`}>
+            {task.priority}
+          </Badge>
+          {assignedTags.map(tag => (
+            <Badge 
+              key={tag.id} 
+              variant="outline" 
+              className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${tagColorMap[tag.color] || 'bg-slate-500/10 text-slate-600 border-slate-500/20'}`}
+            >
+              {tag.name}
+            </Badge>
+          ))}
+        </div>
         
         {/* Quick Move Buttons */}
         <div className="flex items-center gap-1">

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Task, User, Comment, SubTask, Priority, TaskStatus } from '../types/task';
+import { Task, User, Comment, SubTask, Priority, TaskStatus, Tag } from '../types/task';
 import { 
   X, 
   Calendar, 
   User as UserIcon, 
-  Tag, 
+  Tag as TagIcon, 
   CheckSquare, 
   MessageSquare, 
   Plus, 
@@ -15,19 +15,32 @@ import {
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
+import { Badge } from './ui/badge';
 
 interface TaskDetailModalProps {
   task: Task;
   users: User[];
+  tags: Tag[];
   currentUser: User;
   onClose: () => void;
   onUpdateTask: (updatedTask: Task) => void;
   onDeleteTask: (taskId: string) => void;
 }
 
+const tagColorMap: Record<string, string> = {
+  indigo: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20',
+  rose: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
+  emerald: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+  amber: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+  sky: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20',
+  violet: 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20',
+  fuchsia: 'bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400 border-fuchsia-500/20',
+};
+
 export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
   task,
   users,
+  tags,
   currentUser,
   onClose,
   onUpdateTask,
@@ -39,6 +52,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
   const [status, setStatus] = useState<TaskStatus>(task.status);
   const [assigneeId, setAssigneeId] = useState(task.assigneeId);
   const [dueDate, setDueDate] = useState(task.dueDate);
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>(task.tagIds || []);
   
   const [newSubtask, setNewSubtask] = useState('');
   const [newComment, setNewComment] = useState('');
@@ -52,6 +66,19 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
       status,
       assigneeId,
       dueDate,
+      tagIds: selectedTagIds,
+    });
+  };
+
+  const handleToggleTag = (tagId: string) => {
+    const updatedTagIds = selectedTagIds.includes(tagId)
+      ? selectedTagIds.filter(id => id !== tagId)
+      : [...selectedTagIds, tagId];
+    
+    setSelectedTagIds(updatedTagIds);
+    onUpdateTask({
+      ...task,
+      tagIds: updatedTagIds,
     });
   };
 
@@ -209,7 +236,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
             {/* Priority */}
             <div className="space-y-1">
               <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
-                <Tag className="h-3 w-3" /> Priority
+                <TagIcon className="h-3 w-3" /> Priority
               </span>
               <select 
                 value={priority}
@@ -259,6 +286,35 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                 }}
                 className="w-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-xl px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
+            </div>
+          </div>
+
+          {/* Tags Selection Section */}
+          <div className="space-y-2">
+            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
+              <TagIcon className="h-3.5 w-3.5" /> Task Tags
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {tags.map(tag => {
+                const isSelected = selectedTagIds.includes(tag.id);
+                return (
+                  <button
+                    key={tag.id}
+                    type="button"
+                    onClick={() => handleToggleTag(tag.id)}
+                    className={`text-xs font-bold px-3 py-1.5 rounded-xl border transition-all ${
+                      isSelected 
+                        ? `${tagColorMap[tag.color]} border-indigo-500/40 ring-2 ring-indigo-500/20` 
+                        : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                    }`}
+                  >
+                    {tag.name}
+                  </button>
+                );
+              })}
+              {tags.length === 0 && (
+                <p className="text-[10px] text-slate-400 dark:text-slate-500">No tags created yet. Create some in the Workspaces tab!</p>
+              )}
             </div>
           </div>
 

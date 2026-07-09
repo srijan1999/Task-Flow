@@ -6,12 +6,13 @@ import { TaskCard } from '../components/TaskCard';
 import { TaskDetailModal } from '../components/TaskDetailModal';
 import { NewTaskModal } from '../components/NewTaskModal';
 import { ActivityFeed } from '../components/ActivityFeed';
-import { Task, User, Workspace, Activity, TaskStatus } from '../types/task';
+import { Task, User, Workspace, Activity, TaskStatus, Tag } from '../types/task';
 import { 
   mockUsers, 
   mockWorkspaces, 
   mockTasks, 
-  mockActivities 
+  mockActivities,
+  mockTags
 } from '../utils/mockData';
 import { 
   Plus, 
@@ -38,6 +39,11 @@ const Index = () => {
   const [users] = useState<User[]>(mockUsers);
   const [currentUser, setCurrentUser] = useState<User>(mockUsers[0]);
   
+  const [tags, setTags] = useState<Tag[]>(() => {
+    const saved = localStorage.getItem('cotask_tags');
+    return saved ? JSON.parse(saved) : mockTags;
+  });
+
   const [tasks, setTasks] = useState<Task[]>(() => {
     const saved = localStorage.getItem('cotask_tasks');
     return saved ? JSON.parse(saved) : mockTasks;
@@ -82,6 +88,10 @@ const Index = () => {
   useEffect(() => {
     localStorage.setItem('cotask_dark_mode', JSON.stringify(isDarkMode));
   }, [isDarkMode]);
+
+  useEffect(() => {
+    localStorage.setItem('cotask_tags', JSON.stringify(tags));
+  }, [tags]);
 
   // Live Simulation Effect
   useEffect(() => {
@@ -208,6 +218,26 @@ const Index = () => {
     setWorkspaces(prev => [...prev, newWs]);
     setActiveWorkspace(newWs);
     showSuccess(`Workspace "${name}" created!`);
+  };
+
+  const handleAddTag = (name: string, color: string) => {
+    const newTag: Tag = {
+      id: `tag-${Date.now()}`,
+      name,
+      color
+    };
+    setTags(prev => [...prev, newTag]);
+    showSuccess(`Tag "${name}" created!`);
+  };
+
+  const handleDeleteTag = (tagId: string) => {
+    setTags(prev => prev.filter(t => t.id !== tagId));
+    // Also remove this tag from any tasks that have it
+    setTasks(prev => prev.map(t => ({
+      ...t,
+      tagIds: t.tagIds?.filter(id => id !== tagId) || []
+    })));
+    showSuccess(`Tag deleted`);
   };
 
   const handleAddTask = (taskData: Omit<Task, 'id' | 'comments' | 'createdAt'>) => {
@@ -421,6 +451,7 @@ const Index = () => {
                     key={task.id}
                     task={task}
                     users={users}
+                    tags={tags}
                     onClick={() => setSelectedTask(task)}
                     onMoveStatus={handleMoveStatus}
                   />
@@ -453,6 +484,9 @@ const Index = () => {
               onAddWorkspace={handleAddWorkspace}
               isDarkMode={isDarkMode}
               onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
+              tags={tags}
+              onAddTag={handleAddTag}
+              onDeleteTag={handleDeleteTag}
             />
           )}
 
@@ -488,6 +522,7 @@ const Index = () => {
         <TaskDetailModal 
           task={selectedTask}
           users={users}
+          tags={tags}
           currentUser={currentUser}
           onClose={() => setSelectedTask(null)}
           onUpdateTask={handleUpdateTask}
@@ -498,6 +533,7 @@ const Index = () => {
       {isNewTaskOpen && (
         <NewTaskModal 
           users={users}
+          tags={tags}
           workspaceId={activeWorkspace.id}
           onClose={() => setIsNewTaskOpen(false)}
           onAddTask={handleAddTask}
