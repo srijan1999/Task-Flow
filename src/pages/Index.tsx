@@ -342,9 +342,9 @@ const Index = () => {
   const activeColumnTasks = filteredTasks.filter(t => t.status === activeColumn);
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-0 sm:p-4 font-sans">
+    <div className={`min-h-screen bg-slate-950 flex items-center justify-center p-0 sm:p-4 font-sans ${isDarkMode ? 'dark' : ''}`}>
       {/* Simulated Android Device Frame */}
-      <div className={`w-full max-w-md h-screen sm:h-[840px] bg-slate-50 dark:bg-slate-950 sm:rounded-[40px] sm:shadow-2xl border-0 sm:border-[10px] border-slate-900 overflow-hidden flex flex-col relative transition-colors duration-200 ${isDarkMode ? 'dark' : ''}`}>
+      <div className="w-full max-w-md h-screen sm:h-[840px] bg-slate-50 dark:bg-slate-950 sm:rounded-[40px] sm:shadow-2xl border-0 sm:border-[10px] border-slate-900 overflow-hidden flex flex-col relative transition-colors duration-200">
         
         {/* Android Top App Bar */}
         <AndroidTopBar 
