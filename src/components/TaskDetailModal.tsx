@@ -15,7 +15,6 @@ import {
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
-import { Badge } from './ui/badge';
 
 interface TaskDetailModalProps {
   task: Task;
@@ -49,7 +48,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description);
   const [priority, setPriority] = useState<Priority>(task.priority);
-  const [status, setStatus] = useState<TaskStatus>(task.status);
+  const [status, setStatus] = useState<TaskStatus>(task.status === 'review' ? 'in_progress' : task.status);
   const [assigneeId, setAssigneeId] = useState(task.assigneeId);
   const [dueDate, setDueDate] = useState(task.dueDate);
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>(task.tagIds || []);
@@ -228,7 +227,6 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
               >
                 <option value="todo">To Do</option>
                 <option value="in_progress">In Progress</option>
-                <option value="review">In Review</option>
                 <option value="done">Done</option>
               </select>
             </div>

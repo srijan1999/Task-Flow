@@ -19,7 +19,6 @@ import {
   Search, 
   CheckCircle2, 
   Clock, 
-  AlertCircle,
   HelpCircle,
   X
 } from 'lucide-react';
@@ -113,8 +112,8 @@ const Index = () => {
       const randomAction = actions[Math.floor(Math.random() * actions.length)];
 
       if (randomAction === 'move') {
-        const statuses: TaskStatus[] = ['todo', 'in_progress', 'review', 'done'];
-        const currentStatusIndex = statuses.indexOf(randomTask.status);
+        const statuses: TaskStatus[] = ['todo', 'in_progress', 'done'];
+        const currentStatusIndex = statuses.indexOf(randomTask.status === 'review' ? 'in_progress' : randomTask.status);
         let nextStatusIndex = currentStatusIndex + (Math.random() > 0.5 ? 1 : -1);
         if (nextStatusIndex < 0) nextStatusIndex = 1;
         if (nextStatusIndex >= statuses.length) nextStatusIndex = statuses.length - 2;
@@ -128,7 +127,7 @@ const Index = () => {
         const statusLabels = {
           todo: 'To Do',
           in_progress: 'In Progress',
-          review: 'In Review',
+          review: 'In Progress',
           done: 'Done'
         };
 
@@ -303,11 +302,13 @@ const Index = () => {
   };
 
   const handleMoveStatus = (taskId: string, direction: 'left' | 'right') => {
-    const statuses: TaskStatus[] = ['todo', 'in_progress', 'review', 'done'];
+    const statuses: TaskStatus[] = ['todo', 'in_progress', 'done'];
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
 
-    const currentIndex = statuses.indexOf(task.status);
+    // Map review status to in_progress if any legacy tasks exist
+    const currentStatus = task.status === 'review' ? 'in_progress' : task.status;
+    const currentIndex = statuses.indexOf(currentStatus);
     let nextIndex = currentIndex + (direction === 'right' ? 1 : -1);
     
     if (nextIndex >= 0 && nextIndex < statuses.length) {
@@ -319,7 +320,7 @@ const Index = () => {
       const statusLabels = {
         todo: 'To Do',
         in_progress: 'In Progress',
-        review: 'In Review',
+        review: 'In Progress',
         done: 'Done'
       };
 
@@ -358,18 +359,17 @@ const Index = () => {
       icon: <Clock className="h-4 w-4" />
     },
     { 
-      id: 'review', 
-      title: 'Review', 
-      icon: <AlertCircle className="h-4 w-4" />
-    },
-    { 
       id: 'done', 
       title: 'Done', 
       icon: <CheckCircle2 className="h-4 w-4" />
     },
   ];
 
-  const activeColumnTasks = filteredTasks.filter(t => t.status === activeColumn);
+  // Map legacy 'review' tasks to 'in_progress' for display
+  const activeColumnTasks = filteredTasks.filter(t => {
+    const currentStatus = t.status === 'review' ? 'in_progress' : t.status;
+    return currentStatus === activeColumn;
+  });
 
   return (
     <div className={`min-h-screen bg-slate-950 flex items-center justify-center p-0 sm:p-4 font-sans ${isDarkMode ? 'dark' : ''}`}>
@@ -420,7 +420,10 @@ const Index = () => {
               <div className="bg-slate-900 text-white flex border-b border-slate-800/60 shrink-0 select-none">
                 {columns.map((col) => {
                   const isSelected = activeColumn === col.id;
-                  const count = filteredTasks.filter(t => t.status === col.id).length;
+                  const count = filteredTasks.filter(t => {
+                    const currentStatus = t.status === 'review' ? 'in_progress' : t.status;
+                    return currentStatus === col.id;
+                  }).length;
                   return (
                     <button
                       key={col.id}

@@ -129,7 +129,6 @@ export const NewTaskModal: React.FC<NewTaskModalProps> = ({
               >
                 <option value="todo">To Do</option>
                 <option value="in_progress">In Progress</option>
-                <option value="review">In Review</option>
                 <option value="done">Done</option>
               </select>
             </div>
