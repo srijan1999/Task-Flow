@@ -7,6 +7,7 @@ export default defineConfig(() => ({
   server: {
     host: "::",
     port: 8080,
+    allowedHosts: ["bonelike-unmolded-snorkel.ngrok-free.dev"],
   },
   plugins: [dyadComponentTagger(), react()],
   resolve: {

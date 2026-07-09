@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Wifi, Battery, Signal, Sparkles, Sun, Moon } from 'lucide-react';
+import { Search, Wifi, Battery, Signal, Sparkles, Sun, Moon, LogOut } from 'lucide-react';
 import { User, Workspace, AccentColor, accentColorMap } from '../types/task';
 
 interface AndroidTopBarProps {
@@ -9,6 +9,7 @@ interface AndroidTopBarProps {
   isDarkMode: boolean;
   onToggleDarkMode: () => void;
   accentColor: AccentColor;
+  onLogout: () => void;
 }
 
 export const AndroidTopBar: React.FC<AndroidTopBarProps> = ({
@@ -18,6 +19,7 @@ export const AndroidTopBar: React.FC<AndroidTopBarProps> = ({
   isDarkMode,
   onToggleDarkMode,
   accentColor,
+  onLogout,
 }) => {
   const [time, setTime] = React.useState('');
   const accent = accentColorMap[accentColor];
@@ -74,13 +76,22 @@ export const AndroidTopBar: React.FC<AndroidTopBarProps> = ({
           >
             <Search className="h-5 w-5" />
           </button>
-          <img 
-            src={currentUser.avatar} 
-            alt={currentUser.name} 
-            className={`h-8 w-8 rounded-full object-cover ring-2 ring-offset-1 ring-offset-slate-900 ml-1`}
-            style={{ borderColor: accentColor }}
-            title={`Logged in as ${currentUser.name}`}
-          />
+          <div className="flex items-center gap-1 pl-1 border-l border-slate-800">
+            <img 
+              src={currentUser.avatar} 
+              alt={currentUser.name} 
+              className={`h-8 w-8 rounded-full object-cover ring-2 ring-offset-1 ring-offset-slate-900`}
+              style={{ borderColor: accentColor }}
+              title={`Logged in as ${currentUser.name}`}
+            />
+            <button 
+              onClick={onLogout}
+              className="p-1.5 hover:bg-slate-800 rounded-full text-rose-400 hover:text-rose-300 transition-colors"
+              title="Log Out"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
