@@ -1,6 +1,6 @@
 import React from 'react';
 import { Search, Wifi, Battery, Signal, Sparkles, Sun, Moon } from 'lucide-react';
-import { User, Workspace } from '../types/task';
+import { User, Workspace, AccentColor, accentColorMap } from '../types/task';
 
 interface AndroidTopBarProps {
   activeWorkspace: Workspace;
@@ -8,6 +8,7 @@ interface AndroidTopBarProps {
   onSearchClick: () => void;
   isDarkMode: boolean;
   onToggleDarkMode: () => void;
+  accentColor: AccentColor;
 }
 
 export const AndroidTopBar: React.FC<AndroidTopBarProps> = ({
@@ -16,9 +17,10 @@ export const AndroidTopBar: React.FC<AndroidTopBarProps> = ({
   onSearchClick,
   isDarkMode,
   onToggleDarkMode,
+  accentColor,
 }) => {
-  // Get current time for simulated status bar
   const [time, setTime] = React.useState('');
+  const accent = accentColorMap[accentColor];
 
   React.useEffect(() => {
     const updateTime = () => {
@@ -45,7 +47,7 @@ export const AndroidTopBar: React.FC<AndroidTopBarProps> = ({
       {/* Material Top App Bar */}
       <div className="px-5 py-4 flex items-center justify-between border-b border-slate-800/60">
         <div className="flex items-center gap-3">
-          <div className="bg-indigo-600 p-2 rounded-xl text-white shadow-md shadow-indigo-600/20">
+          <div className={`${accent.bg} p-2 rounded-xl text-white shadow-md ${accent.shadow}`}>
             <Sparkles className="h-5 w-5" />
           </div>
           <div>
@@ -75,7 +77,8 @@ export const AndroidTopBar: React.FC<AndroidTopBarProps> = ({
           <img 
             src={currentUser.avatar} 
             alt={currentUser.name} 
-            className="h-8 w-8 rounded-full object-cover ring-2 ring-indigo-500/40 ml-1"
+            className={`h-8 w-8 rounded-full object-cover ring-2 ring-offset-1 ring-offset-slate-900 ml-1`}
+            style={{ borderColor: accentColor }}
             title={`Logged in as ${currentUser.name}`}
           />
         </div>

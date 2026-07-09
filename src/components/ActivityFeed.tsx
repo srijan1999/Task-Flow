@@ -1,20 +1,23 @@
 import React from 'react';
-import { Activity } from '../types/task';
+import { Activity, AccentColor, accentColorMap } from '../types/task';
 import { Radio, Clock, Sparkles } from 'lucide-react';
 
 interface ActivityFeedProps {
   activities: Activity[];
+  accentColor: AccentColor;
 }
 
-export const ActivityFeed: React.FC<ActivityFeedProps> = ({ activities }) => {
+export const ActivityFeed: React.FC<ActivityFeedProps> = ({ activities, accentColor }) => {
+  const accent = accentColorMap[accentColor];
+
   return (
     <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-slate-50 dark:bg-slate-950 select-none transition-colors duration-200">
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
-          <Radio className="h-4 w-4 text-indigo-600 dark:text-indigo-400 animate-pulse" />
+          <Radio className={`h-4 w-4 ${accent.text} ${accent.textDark} animate-pulse`} />
           <h3 className="font-bold text-slate-700 dark:text-slate-300 text-xs uppercase tracking-wider">Live Activity</h3>
         </div>
-        <span className="bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold px-2 py-0.5 rounded-full">
+        <span className={`${accent.bgLight} ${accent.bgLightDark} ${accent.text} ${accent.textDark} text-[10px] font-bold px-2 py-0.5 rounded-full`}>
           Real-time
         </span>
       </div>
@@ -35,7 +38,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({ activities }) => {
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                 <span className="font-extrabold text-slate-800 dark:text-slate-200">{act.userName}</span>{' '}
                 <span className="text-slate-500 dark:text-slate-500 font-medium">{act.action}</span>{' '}
-                <span className="font-bold text-indigo-600 dark:text-indigo-400 block truncate mt-0.5">{act.targetName}</span>
+                <span className={`font-bold ${accent.text} ${accent.textDark} block truncate mt-0.5`}>{act.targetName}</span>
               </p>
               <div className="flex items-center gap-1 text-[9px] text-slate-400 dark:text-slate-500 font-bold">
                 <Clock className="h-3 w-3" />

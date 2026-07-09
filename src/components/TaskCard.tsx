@@ -1,5 +1,5 @@
 import React from 'react';
-import { Task, User, Tag } from '../types/task';
+import { Task, User, Tag, AccentColor, accentColorMap } from '../types/task';
 import { 
   Calendar, 
   CheckSquare, 
@@ -14,6 +14,7 @@ interface TaskCardProps {
   tags: Tag[];
   onClick: () => void;
   onMoveStatus: (taskId: string, direction: 'left' | 'right') => void;
+  accentColor: AccentColor;
 }
 
 const priorityColors = {
@@ -33,8 +34,9 @@ const tagColorMap: Record<string, string> = {
   fuchsia: 'bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400 border-fuchsia-500/20',
 };
 
-export const TaskCard: React.FC<TaskCardProps> = ({ task, users, tags, onClick, onMoveStatus }) => {
+export const TaskCard: React.FC<TaskCardProps> = ({ task, users, tags, onClick, onMoveStatus, accentColor }) => {
   const assignee = users.find(u => u.id === task.assigneeId);
+  const accent = accentColorMap[accentColor];
   
   const completedSubtasks = task.subtasks.filter(s => s.completed).length;
   const totalSubtasks = task.subtasks.length;
@@ -96,7 +98,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, users, tags, onClick, 
 
       {/* Title & Description */}
       <div className="space-y-1">
-        <h4 className="font-bold text-slate-800 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-150 text-sm line-clamp-2 leading-snug">
+        <h4 className={`font-bold text-slate-800 dark:text-slate-100 group-hover:${accent.text} dark:group-hover:${accent.textDark} transition-colors duration-150 text-sm line-clamp-2 leading-snug`}>
           {task.title}
         </h4>
         {task.description && (
@@ -118,7 +120,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, users, tags, onClick, 
           </div>
           <div className="w-full bg-slate-100 dark:bg-slate-800 h-1 rounded-full overflow-hidden">
             <div 
-              className="bg-indigo-600 h-full rounded-full transition-all duration-300"
+              className={`${accent.bg} h-full rounded-full transition-all duration-300`}
               style={{ width: `${progressPercentage}%` }}
             />
           </div>

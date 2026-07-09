@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Workspace, Tag } from '../types/task';
+import { User, Workspace, Tag, AccentColor, accentColorMap } from '../types/task';
 import { 
   Sparkles, 
   Smartphone, 
@@ -12,7 +12,8 @@ import {
   Settings,
   Moon,
   Tag as TagIcon,
-  Trash2
+  Trash2,
+  Palette
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -33,6 +34,8 @@ interface WorkspaceSidebarProps {
   tags: Tag[];
   onAddTag: (name: string, color: string) => void;
   onDeleteTag: (tagId: string) => void;
+  accentColor: AccentColor;
+  onAccentColorChange: (color: AccentColor) => void;
 }
 
 const iconMap: Record<string, React.ComponentType<any>> = {
@@ -53,6 +56,15 @@ const tagColorMap: Record<string, string> = {
   fuchsia: 'bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400 border-fuchsia-500/20',
 };
 
+const accentColors: { id: AccentColor; name: string; hex: string }[] = [
+  { id: 'indigo', name: 'Indigo', hex: '#6366f1' },
+  { id: 'emerald', name: 'Emerald', hex: '#10b981' },
+  { id: 'rose', name: 'Rose', hex: '#f43f5e' },
+  { id: 'amber', name: 'Amber', hex: '#f59e0b' },
+  { id: 'violet', name: 'Violet', hex: '#8b5cf6' },
+  { id: 'sky', name: 'Sky', hex: '#0ea5e9' },
+];
+
 export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
   workspaces,
   activeWorkspace,
@@ -68,6 +80,8 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
   tags,
   onAddTag,
   onDeleteTag,
+  accentColor,
+  onAccentColorChange,
 }) => {
   const [newWorkspaceName, setNewWorkspaceName] = useState('');
   const [newWorkspaceDesc, setNewWorkspaceDesc] = useState('');
@@ -76,6 +90,8 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
   // Tag creation state
   const [newTagName, setNewTagName] = useState('');
   const [selectedColor, setSelectedColor] = useState('indigo');
+
+  const accent = accentColorMap[accentColor];
 
   const handleCreateWorkspace = (e: React.FormEvent) => {
     e.preventDefault();
@@ -116,7 +132,7 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                     value={newWorkspaceName}
                     onChange={(e) => setNewWorkspaceName(e.target.value)}
                     placeholder="e.g., Marketing Launch"
-                    className="bg-slate-800 border-slate-700 text-white focus:ring-indigo-500 rounded-xl"
+                    className={`bg-slate-800 border-slate-700 text-white ${accent.ring} rounded-xl`}
                     required
                   />
                 </div>
@@ -126,10 +142,10 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                     value={newWorkspaceDesc}
                     onChange={(e) => setNewWorkspaceDesc(e.target.value)}
                     placeholder="Brief description"
-                    className="bg-slate-800 border-slate-700 text-white focus:ring-indigo-500 rounded-xl"
+                    className={`bg-slate-800 border-slate-700 text-white ${accent.ring} rounded-xl`}
                   />
                 </div>
-                <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold">
+                <Button type="submit" className={`w-full ${accent.bg} ${accent.bgHover} text-white rounded-xl font-bold`}>
                   Create Workspace
                 </Button>
               </form>
@@ -147,7 +163,7 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                 onClick={() => setActiveWorkspace(ws)}
                 className={`w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-sm font-bold transition-all duration-200 ${
                   isActive 
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/10' 
+                    ? `${accent.bg} text-white shadow-md ${accent.shadow}` 
                     : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white border border-slate-100 dark:border-slate-800 shadow-sm'
                 }`}
               >
@@ -178,10 +194,10 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                 value={newTagName}
                 onChange={(e) => setNewTagName(e.target.value)}
                 placeholder="New tag name..."
-                className="flex-1 border-slate-200 dark:border-slate-800 bg-transparent dark:text-slate-200 focus:ring-indigo-500 rounded-xl text-xs h-9"
+                className={`flex-1 border-slate-200 dark:border-slate-800 bg-transparent dark:text-slate-200 ${accent.ring} rounded-xl text-xs h-9`}
                 required
               />
-              <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs h-9 px-3">
+              <Button type="submit" className={`${accent.bg} ${accent.bgHover} text-white rounded-xl text-xs h-9 px-3`}>
                 Add Tag
               </Button>
             </div>
@@ -196,10 +212,11 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                     onClick={() => setSelectedColor(color)}
                     className={`h-5 w-5 rounded-full border transition-all ${
                       selectedColor === color 
-                        ? 'ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-slate-900 scale-110' 
+                        ? `ring-2 ring-offset-2 dark:ring-offset-slate-900 scale-110` 
                         : 'opacity-70 hover:opacity-100'
-                    } bg-${color}-500`}
+                    }`}
                     style={{
+                      borderColor: selectedColor === color ? '#6366f1' : 'transparent',
                       backgroundColor: color === 'indigo' ? '#6366f1' : 
                                        color === 'rose' ? '#f43f5e' : 
                                        color === 'emerald' ? '#10b981' : 
@@ -259,7 +276,7 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                   onClick={() => setCurrentUser(u)}
                   className={`w-full flex items-center justify-between p-2.5 rounded-xl text-xs font-bold transition-all ${
                     isMe 
-                      ? 'bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/50 text-indigo-600 dark:text-indigo-400' 
+                      ? `${accent.bgLight} ${accent.bgLightDark} border ${accent.border} ${accent.borderDark} ${accent.text} ${accent.textDark}` 
                       : 'border border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-800 dark:hover:text-white'
                   }`}
                 >
@@ -271,7 +288,7 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                     </div>
                   </div>
                   {isMe && (
-                    <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 text-[8px] px-2 py-0.5 rounded-full font-extrabold uppercase tracking-wider">
+                    <span className={`${accent.bgLight} ${accent.bgLightDark} ${accent.text} ${accent.textDark} text-[8px] px-2 py-0.5 rounded-full font-extrabold uppercase tracking-wider`}>
                       You
                     </span>
                   )}
@@ -289,8 +306,34 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
           <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">App Settings</span>
         </div>
         <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-100 dark:border-slate-800 shadow-sm space-y-4 transition-colors duration-200">
+          {/* Accent Color Selector */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Palette className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Accent Color</span>
+            </div>
+            <div className="flex gap-2 justify-between px-1">
+              {accentColors.map((color) => (
+                <button
+                  key={color.id}
+                  onClick={() => onAccentColorChange(color.id)}
+                  className={`h-6 w-6 rounded-full border transition-all ${
+                    accentColor === color.id 
+                      ? 'ring-2 ring-offset-2 dark:ring-offset-slate-900 scale-110' 
+                      : 'opacity-70 hover:opacity-100'
+                  }`}
+                  style={{
+                    backgroundColor: color.hex,
+                    borderColor: accentColor === color.id ? color.hex : 'transparent'
+                  }}
+                  title={color.name}
+                />
+              ))}
+            </div>
+          </div>
+
           {/* Dark Mode Switch */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-3">
             <div className="flex items-center gap-2">
               <Moon className="h-4 w-4 text-slate-500 dark:text-slate-400" />
               <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Dark Theme</span>
@@ -298,7 +341,7 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
             <button
               onClick={onToggleDarkMode}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none ${
-                isDarkMode ? 'bg-indigo-600' : 'bg-slate-200 dark:bg-slate-800'
+                isDarkMode ? accent.bg : 'bg-slate-200 dark:bg-slate-800'
               }`}
             >
               <span

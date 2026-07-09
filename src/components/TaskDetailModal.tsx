@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Task, User, Comment, SubTask, Priority, TaskStatus, Tag } from '../types/task';
+import { Task, User, Comment, SubTask, Priority, TaskStatus, Tag, AccentColor, accentColorMap } from '../types/task';
 import { 
   X, 
   Calendar, 
@@ -24,6 +24,7 @@ interface TaskDetailModalProps {
   onClose: () => void;
   onUpdateTask: (updatedTask: Task) => void;
   onDeleteTask: (taskId: string) => void;
+  accentColor: AccentColor;
 }
 
 const tagColorMap: Record<string, string> = {
@@ -44,6 +45,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
   onClose,
   onUpdateTask,
   onDeleteTask,
+  accentColor,
 }) => {
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description);
@@ -55,6 +57,8 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
   
   const [newSubtask, setNewSubtask] = useState('');
   const [newComment, setNewComment] = useState('');
+
+  const accent = accentColorMap[accentColor];
 
   const handleSave = () => {
     onUpdateTask({
@@ -154,7 +158,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Task Details</span>
             <span className="text-slate-300 dark:text-slate-700">•</span>
-            <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 px-2 py-0.5 rounded-full">
+            <span className={`text-xs font-bold ${accent.text} ${accent.textDark} ${accent.bgLight} ${accent.bgLightDark} px-2 py-0.5 rounded-full`}>
               ID: {task.id}
             </span>
           </div>
@@ -190,7 +194,8 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                 onUpdateTask({ ...task, title: e.target.value });
               }}
               onBlur={handleSave}
-              className="w-full text-xl font-extrabold text-slate-800 dark:text-slate-100 bg-transparent border-b border-transparent hover:border-slate-200 dark:hover:border-slate-800 focus:border-indigo-500 focus:outline-none pb-1 transition-colors"
+              className={`w-full text-xl font-extrabold text-slate-800 dark:text-slate-100 bg-transparent border-b border-transparent hover:border-slate-200 dark:hover:border-slate-800 focus:border-indigo-500 focus:outline-none pb-1 transition-colors`}
+              style={{ caretColor: accentColor }}
               placeholder="Task Title"
             />
             
@@ -204,7 +209,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                 }}
                 onBlur={handleSave}
                 placeholder="Add a detailed description..."
-                className="min-h-[80px] text-sm resize-none border-slate-200 dark:border-slate-800 bg-transparent dark:text-slate-200 focus:ring-indigo-500 rounded-2xl"
+                className={`min-h-[80px] text-sm resize-none border-slate-200 dark:border-slate-800 bg-transparent dark:text-slate-200 ${accent.ring} rounded-2xl`}
               />
             </div>
           </div>
@@ -223,7 +228,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                   setStatus(val);
                   onUpdateTask({ ...task, status: val });
                 }}
-                className="w-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className={`w-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 focus:outline-none focus:ring-2 ${accent.ring}`}
               >
                 <option value="todo">To Do</option>
                 <option value="in_progress">In Progress</option>
@@ -243,7 +248,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                   setPriority(val);
                   onUpdateTask({ ...task, priority: val });
                 }}
-                className="w-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className={`w-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 focus:outline-none focus:ring-2 ${accent.ring}`}
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
@@ -262,7 +267,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                   setAssigneeId(e.target.value);
                   onUpdateTask({ ...task, assigneeId: e.target.value });
                 }}
-                className="w-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className={`w-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 focus:outline-none focus:ring-2 ${accent.ring}`}
               >
                 {users.map(u => (
                   <option key={u.id} value={u.id}>{u.name}</option>
@@ -282,7 +287,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                   setDueDate(e.target.value);
                   onUpdateTask({ ...task, dueDate: e.target.value });
                 }}
-                className="w-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-xl px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className={`w-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-xl px-2 py-1.5 focus:outline-none focus:ring-2 ${accent.ring}`}
               />
             </div>
           </div>
@@ -330,7 +335,8 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                       type="checkbox"
                       checked={sub.completed}
                       onChange={() => handleToggleSubtask(sub.id)}
-                      className="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500 bg-transparent"
+                      className={`h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500 bg-transparent`}
+                      style={{ accentColor }}
                     />
                     <span className={`text-xs font-semibold ${sub.completed ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-700 dark:text-slate-200'}`}>
                       {sub.title}
@@ -353,9 +359,9 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                 value={newSubtask}
                 onChange={(e) => setNewSubtask(e.target.value)}
                 placeholder="Add subtask..."
-                className="flex-1 border-slate-200 dark:border-slate-800 bg-transparent dark:text-slate-200 focus:ring-indigo-500 rounded-xl text-xs h-9"
+                className={`flex-1 border-slate-200 dark:border-slate-800 bg-transparent dark:text-slate-200 ${accent.ring} rounded-xl text-xs h-9`}
               />
-              <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs h-9 px-3">
+              <Button type="submit" className={`${accent.bg} ${accent.bgHover} text-white rounded-xl text-xs h-9 px-3`}>
                 Add
               </Button>
             </form>
@@ -375,9 +381,9 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   placeholder="Write a comment..."
-                  className="flex-1 border-slate-200 dark:border-slate-800 bg-transparent dark:text-slate-200 focus:ring-indigo-500 rounded-xl text-xs h-9"
+                  className={`flex-1 border-slate-200 dark:border-slate-800 bg-transparent dark:text-slate-200 ${accent.ring} rounded-xl text-xs h-9`}
                 />
-                <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl h-9 w-9 p-0 shrink-0">
+                <Button type="submit" className={`${accent.bg} ${accent.bgHover} text-white rounded-xl h-9 w-9 p-0 shrink-0`}>
                   <Send className="h-3.5 w-3.5" />
                 </Button>
               </div>

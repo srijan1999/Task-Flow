@@ -1,5 +1,6 @@
 import React from 'react';
 import { CheckSquare, Layers, Radio } from 'lucide-react';
+import { AccentColor, accentColorMap } from '../types/task';
 
 export type AndroidTab = 'board' | 'workspaces' | 'activity';
 
@@ -7,13 +8,16 @@ interface AndroidBottomNavigationProps {
   activeTab: AndroidTab;
   setActiveTab: (tab: AndroidTab) => void;
   activityCount?: number;
+  accentColor: AccentColor;
 }
 
 export const AndroidBottomNavigation: React.FC<AndroidBottomNavigationProps> = ({
   activeTab,
   setActiveTab,
   activityCount = 0,
+  accentColor,
 }) => {
+  const accent = accentColorMap[accentColor];
   const navItems = [
     { id: 'board' as AndroidTab, label: 'Tasks', icon: CheckSquare },
     { id: 'workspaces' as AndroidTab, label: 'Workspaces', icon: Layers },
@@ -36,7 +40,7 @@ export const AndroidBottomNavigation: React.FC<AndroidBottomNavigationProps> = (
             <div 
               className={`px-6 py-1 rounded-full transition-all duration-200 flex items-center justify-center ${
                 isActive 
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' 
+                  ? `${accent.bg} text-white shadow-lg ${accent.shadow}` 
                   : 'text-slate-400 group-hover:text-slate-200'
               }`}
             >
@@ -47,7 +51,7 @@ export const AndroidBottomNavigation: React.FC<AndroidBottomNavigationProps> = (
             </div>
             <span 
               className={`text-[10px] font-bold tracking-wide transition-colors duration-200 ${
-                isActive ? 'text-indigo-400' : 'text-slate-500 group-hover:text-slate-400'
+                isActive ? accent.textMuted : 'text-slate-500 group-hover:text-slate-400'
               }`}
             >
               {item.label}

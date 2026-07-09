@@ -6,7 +6,7 @@ import { TaskCard } from '../components/TaskCard';
 import { TaskDetailModal } from '../components/TaskDetailModal';
 import { NewTaskModal } from '../components/NewTaskModal';
 import { ActivityFeed } from '../components/ActivityFeed';
-import { Task, User, Workspace, Activity, TaskStatus, Tag } from '../types/task';
+import { Task, User, Workspace, Activity, TaskStatus, Tag, AccentColor, accentColorMap } from '../types/task';
 import { 
   mockUsers, 
   mockWorkspaces, 
@@ -62,6 +62,12 @@ const Index = () => {
     const saved = localStorage.getItem('cotask_dark_mode');
     return saved ? JSON.parse(saved) : false;
   });
+
+  // Accent Color State
+  const [accentColor, setAccentColor] = useState<AccentColor>(() => {
+    const saved = localStorage.getItem('cotask_accent_color');
+    return saved ? (saved as AccentColor) : 'indigo';
+  });
   
   // Android Navigation State
   const [activeTab, setActiveTab] = useState<AndroidTab>('board');
@@ -70,6 +76,8 @@ const Index = () => {
   // Modals
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isNewTaskOpen, setIsNewTaskOpen] = useState(false);
+
+  const accent = accentColorMap[accentColor];
 
   // Save to localStorage
   useEffect(() => {
@@ -91,6 +99,10 @@ const Index = () => {
   useEffect(() => {
     localStorage.setItem('cotask_tags', JSON.stringify(tags));
   }, [tags]);
+
+  useEffect(() => {
+    localStorage.setItem('cotask_accent_color', accentColor);
+  }, [accentColor]);
 
   // Live Simulation Effect
   useEffect(() => {
@@ -383,6 +395,7 @@ const Index = () => {
           onSearchClick={() => setIsSearchOpen(!isSearchOpen)}
           isDarkMode={isDarkMode}
           onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
+          accentColor={accentColor}
         />
 
         {/* Search Bar Overlay */}
@@ -394,7 +407,7 @@ const Index = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search tasks..."
-                className="pl-9 bg-slate-800 border-slate-700 text-white focus:bg-slate-800 focus:ring-indigo-500 rounded-xl text-xs h-9"
+                className={`pl-9 bg-slate-800 border-slate-700 text-white ${accent.ring} rounded-xl text-xs h-9`}
                 autoFocus
               />
             </div>
@@ -431,7 +444,7 @@ const Index = () => {
                       className="flex-1 py-3 flex flex-col items-center gap-1 relative focus:outline-none"
                     >
                       <div className={`flex items-center gap-1 text-xs font-bold transition-colors ${
-                        isSelected ? 'text-indigo-400' : 'text-slate-400'
+                        isSelected ? accent.textMuted : 'text-slate-400'
                       }`}>
                         <span>{col.title}</span>
                         <span className="bg-slate-800 text-[10px] px-1.5 py-0.5 rounded-full text-slate-300">
@@ -440,7 +453,7 @@ const Index = () => {
                       </div>
                       {/* Active Indicator Line */}
                       {isSelected && (
-                        <div className="absolute bottom-0 left-4 right-4 h-0.5 bg-indigo-500 rounded-t-full" />
+                        <div className={`absolute bottom-0 left-4 right-4 h-0.5 ${accent.bg} rounded-t-full`} />
                       )}
                     </button>
                   );
@@ -457,6 +470,7 @@ const Index = () => {
                     tags={tags}
                     onClick={() => setSelectedTask(task)}
                     onMoveStatus={handleMoveStatus}
+                    accentColor={accentColor}
                   />
                 ))}
                 {activeColumnTasks.length === 0 && (
@@ -490,18 +504,20 @@ const Index = () => {
               tags={tags}
               onAddTag={handleAddTag}
               onDeleteTag={handleDeleteTag}
+              accentColor={accentColor}
+              onAccentColorChange={setAccentColor}
             />
           )}
 
           {activeTab === 'activity' && (
-            <ActivityFeed activities={activities} />
+            <ActivityFeed activities={activities} accentColor={accentColor} />
           )}
 
           {/* Android Floating Action Button (FAB) */}
           {activeTab === 'board' && (
             <button
               onClick={() => setIsNewTaskOpen(true)}
-              className="absolute bottom-6 right-6 bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-[20px] shadow-xl shadow-indigo-600/30 active:scale-95 transition-all z-20 flex items-center justify-center"
+              className={`absolute bottom-6 right-6 ${accent.bg} ${accent.bgHover} text-white p-4 rounded-[20px] shadow-xl ${accent.shadowFab} active:scale-95 transition-all z-20 flex items-center justify-center`}
               title="Create New Task"
             >
               <Plus className="h-6 w-6" />
@@ -514,6 +530,7 @@ const Index = () => {
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           activityCount={activities.length}
+          accentColor={accentColor}
         />
 
         {/* Simulated Android Home Indicator Bar */}
@@ -530,6 +547,7 @@ const Index = () => {
           onClose={() => setSelectedTask(null)}
           onUpdateTask={handleUpdateTask}
           onDeleteTask={handleDeleteTask}
+          accentColor={accentColor}
         />
       )}
 
@@ -540,6 +558,7 @@ const Index = () => {
           workspaceId={activeWorkspace.id}
           onClose={() => setIsNewTaskOpen(false)}
           onAddTask={handleAddTask}
+          accentColor={accentColor}
         />
       )}
     </div>

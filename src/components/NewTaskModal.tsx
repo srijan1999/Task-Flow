@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Task, User, Priority, TaskStatus, Tag } from '../types/task';
+import { Task, User, Priority, TaskStatus, Tag, AccentColor, accentColorMap } from '../types/task';
 import { X, Tag as TagIcon } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -11,6 +11,7 @@ interface NewTaskModalProps {
   workspaceId: string;
   onClose: () => void;
   onAddTask: (task: Omit<Task, 'id' | 'comments' | 'createdAt'>) => void;
+  accentColor: AccentColor;
 }
 
 const tagColorMap: Record<string, string> = {
@@ -29,6 +30,7 @@ export const NewTaskModal: React.FC<NewTaskModalProps> = ({
   workspaceId,
   onClose,
   onAddTask,
+  accentColor,
 }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -37,6 +39,8 @@ export const NewTaskModal: React.FC<NewTaskModalProps> = ({
   const [assigneeId, setAssigneeId] = useState(users[0]?.id || '');
   const [dueDate, setDueDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
+
+  const accent = accentColorMap[accentColor];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,7 +95,7 @@ export const NewTaskModal: React.FC<NewTaskModalProps> = ({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="What needs to be done?"
-              className="border-slate-200 dark:border-slate-800 bg-transparent dark:text-slate-200 focus:ring-indigo-500 rounded-2xl text-sm"
+              className={`border-slate-200 dark:border-slate-800 bg-transparent dark:text-slate-200 ${accent.ring} rounded-2xl text-sm`}
               required
             />
           </div>
@@ -102,7 +106,7 @@ export const NewTaskModal: React.FC<NewTaskModalProps> = ({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Add more details..."
-              className="min-h-[80px] resize-none border-slate-200 dark:border-slate-800 bg-transparent dark:text-slate-200 focus:ring-indigo-500 rounded-2xl text-sm"
+              className={`min-h-[80px] resize-none border-slate-200 dark:border-slate-800 bg-transparent dark:text-slate-200 ${accent.ring} rounded-2xl text-sm`}
             />
           </div>
 
@@ -112,7 +116,7 @@ export const NewTaskModal: React.FC<NewTaskModalProps> = ({
               <select 
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as Priority)}
-                className="w-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-2xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className={`w-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-2xl px-3 py-2.5 focus:outline-none focus:ring-2 ${accent.ring}`}
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
@@ -125,7 +129,7 @@ export const NewTaskModal: React.FC<NewTaskModalProps> = ({
               <select 
                 value={status}
                 onChange={(e) => setStatus(e.target.value as TaskStatus)}
-                className="w-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-2xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className={`w-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-2xl px-3 py-2.5 focus:outline-none focus:ring-2 ${accent.ring}`}
               >
                 <option value="todo">To Do</option>
                 <option value="in_progress">In Progress</option>
@@ -140,7 +144,7 @@ export const NewTaskModal: React.FC<NewTaskModalProps> = ({
               <select 
                 value={assigneeId}
                 onChange={(e) => setAssigneeId(e.target.value)}
-                className="w-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-2xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className={`w-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-2xl px-3 py-2.5 focus:outline-none focus:ring-2 ${accent.ring}`}
               >
                 {users.map(u => (
                   <option key={u.id} value={u.id}>{u.name}</option>
@@ -154,7 +158,7 @@ export const NewTaskModal: React.FC<NewTaskModalProps> = ({
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="w-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-2xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className={`w-full text-xs font-bold bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-2xl px-3 py-2 focus:outline-none focus:ring-2 ${accent.ring}`}
               />
             </div>
           </div>
@@ -185,7 +189,7 @@ export const NewTaskModal: React.FC<NewTaskModalProps> = ({
             </div>
           </div>
 
-          <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl py-3 font-bold mt-4 shadow-lg shadow-indigo-600/20">
+          <Button type="submit" className={`w-full ${accent.bg} ${accent.bgHover} text-white rounded-2xl py-3 font-bold mt-4 shadow-lg ${accent.shadowFab}`}>
             Create Task
           </Button>
         </form>
