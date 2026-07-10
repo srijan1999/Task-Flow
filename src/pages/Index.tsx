@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { AppHeader } from "../components/AppHeader";
 import { WorkspaceSidebar } from "../components/WorkspaceSidebar";
 import { TaskCard } from "../components/TaskCard";
@@ -40,34 +40,41 @@ const Index = () => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isNewTaskOpen, setIsNewTaskOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const touchStartX = useRef(0);
+  const touchCurrentX = useRef(0);
 
   const accent = accentColorMap[accentColor];
 
   // Swipe gesture handling for mobile sidebar
   useEffect(() => {
-    let startX = 0;
-    let currentX = 0;
-    const threshold = 50; // Minimum swipe distance
-
     const handleTouchStart = (e: TouchEvent) => {
-      startX = e.touches[0].clientX;
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      currentX = e.touches[0].clientX;
-    };
-
-    const handleTouchEnd = () => {
-      const deltaX = currentX - startX;
-      if (!isSidebarOpen && startX < 30 && deltaX > threshold) {
-        setIsSidebarOpen(true);
-      } else if (isSidebarOpen && deltaX < -threshold) {
-        setIsSidebarOpen(false);
+      // Only track swipes from the left edge when sidebar is closed
+      if (!isSidebarOpen && e.touches[0].clientX < 30) {
+        touchStartX.current = e.touches[0].clientX;
       }
     };
 
-    document.addEventListener("touchstart", handleTouchStart);
-    document.addEventListener("touchmove", handleTouchMove);
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!isSidebarOpen) {
+        touchCurrentX.current = e.touches[0].clientX;
+      }
+    };
+
+    const handleTouchEnd = () => {
+      // Only open sidebar with right swipe from left edge
+      if (!isSidebarOpen) {
+        const deltaX = touchCurrentX.current - touchStartX.current;
+        if (deltaX > 50) {
+          setIsSidebarOpen(true);
+        }
+      }
+      // Reset values
+      touchStartX.current = 0;
+      touchCurrentX.current = 0;
+    };
+
+    document.addEventListener("touchstart", handleTouchStart, { passive: true });
+    document.addEventListener("touchmove", handleTouchMove, { passive: true });
     document.addEventListener("touchend", handleTouchEnd);
 
     return () => {
