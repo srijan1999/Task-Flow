@@ -9,7 +9,6 @@ import {
   Trash2,
   Palette,
   Moon,
-  User,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -30,7 +29,7 @@ interface WorkspaceSidebarProps {
   onDeleteTag: (tagId: string) => void;
   accentColor: AccentColor;
   onAccentColorChange: (color: AccentColor) => void;
-  currentUser?: { name: string; avatar: string };
+  currentUser?: { name: string; avatar: string; role?: string };
 }
 
 const iconMap: Record<string, React.ComponentType<any>> = {
@@ -117,9 +116,15 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
               {currentUser.name}
             </p>
             <p className="text-xs text-slate-400 dark:text-slate-500">
-              {currentUser.role}
+              {currentUser.role || "Team Member"}
             </p>
           </div>
+        </div>
+      )}
+
+      {/* Change Avatar Button - Below Profile */}
+      {currentUser && (
+        <div className="px-1">
           <AvatarUpload
             currentAvatar={currentUser.avatar}
             userName={currentUser.name}
