@@ -427,8 +427,8 @@ const Index = () => {
   }
 
   return (
-    <div className={`min-h-screen bg-slate-50 dark:bg-slate-950 ${isDarkMode ? "dark" : ""} transition-colors duration-200 font-sans`}>
-      <div className="flex h-screen overflow-hidden">
+    <div className={`min-h-screen bg-slate-50 dark:bg-slate-950 ${isDarkMode ? "dark" : ""} transition-colors duration-200 font-sans flex flex-col`}>
+      <div className="flex h-screen overflow-hidden flex-1">
         {/* Desktop Sidebar */}
         <aside className="hidden lg:flex w-80 flex-col border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0">
           {sidebarContent}
@@ -470,9 +470,9 @@ const Index = () => {
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-hidden flex flex-col">
+          <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {activeTab === "board" && (
-              <div className="flex flex-col overflow-hidden">
+              <div className="space-y-3">
                 <div className="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 shrink-0">
                   {columns.map((col) => {
                     const isSelected = activeColumn === col.id;
@@ -499,7 +499,7 @@ const Index = () => {
                     );
                   })}
                 </div>
-                <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800">
                   {activeColumnTasks.map((task) => (
                     <TaskCard
                       key={task.id}
@@ -529,7 +529,11 @@ const Index = () => {
                 </div>
               </div>
             )}
-            {activeTab === "activity" && <ActivityFeed activities={activities} accentColor={accentColor} />}
+            {activeTab === "activity" && (
+              <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800">
+                <ActivityFeed activities={activities} accentColor={accentColor} />
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -564,6 +568,11 @@ const Index = () => {
           accentColor={accentColor}
         />
       )}
+
+      {/* Footer */}
+      <footer className="mt-auto py-4 px-6 text-center text-xs text-slate-400 dark:text-slate-500 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+        Developed with ❤️ by Srijan
+      </footer>
     </div>
   );
 };
