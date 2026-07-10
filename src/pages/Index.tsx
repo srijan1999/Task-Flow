@@ -514,7 +514,7 @@ const Index = () => {
           <div className="flex-1 overflow-hidden flex flex-col">
             {activeTab === "board" && (
               <div className="flex flex-col overflow-hidden">
-                <div className="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 px-4 shrink-0">
+                <div className="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 shrink-0">
                   {columns.map((col) => {
                     const isSelected = activeColumn === col.id;
                     const count = filteredTasks.filter((t) => {
