@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Camera, X } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,18 @@ export function AvatarUpload({ currentAvatar, userName, onAvatarUpdate, accentCo
   const [preview, setPreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (data.user) {
+        setUserId(data.user.id);
+      }
+    };
+    getUser();
+  }, []);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -39,13 +50,13 @@ export function AvatarUpload({ currentAvatar, userName, onAvatarUpdate, accentCo
   };
 
   const uploadAvatar = async () => {
-    if (!file) return;
+    if (!file || !userId) return;
 
     setUploading(true);
     try {
       const fileExt = file.name.split(".").pop();
       const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `avatars/${fileName}`;
+      const filePath = `${userId}/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from("avatars")
@@ -62,18 +73,16 @@ export function AvatarUpload({ currentAvatar, userName, onAvatarUpdate, accentCo
 
       const newAvatarUrl = publicData.publicUrl;
 
-      // Update user metadata
       const { error: updateError } = await supabase.auth.updateUser({
         data: { avatar: newAvatarUrl },
       });
 
       if (updateError) throw updateError;
 
-      // Update profile in profiles table
       const { error: profileError } = await supabase
         .from("profiles")
         .update({ avatar_url: newAvatarUrl })
-        .eq("id", supabase.auth.getUser());
+        .eq("id", userId);
 
       if (profileError) throw profileError;
 
@@ -90,8 +99,9 @@ export function AvatarUpload({ currentAvatar, userName, onAvatarUpdate, accentCo
   };
 
   const removeAvatar = async () => {
+    if (!userId) return;
+    
     try {
-      // Reset to default avatar
       const defaultAvatar = `https://api.dicebear.com/7.x/initialism/svg?seed=${userName}`;
       await supabase.auth.updateUser({
         data: { avatar: defaultAvatar },
