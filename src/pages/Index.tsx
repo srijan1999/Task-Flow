@@ -6,6 +6,7 @@ import { TaskDetailModal } from "../components/TaskDetailModal";
 import { NewTaskModal } from "../components/NewTaskModal";
 import { ActivityFeed } from "../components/ActivityFeed";
 import { AuthScreen } from "../components/AuthScreen";
+import { FirstWorkspaceScreen } from "../components/FirstWorkspaceScreen";
 import { Task, User, Workspace, Activity, TaskStatus, Tag, AccentColor, accentColorMap } from "../types/task";
 import { mockUsers, mockWorkspaces, mockTasks, mockActivities, mockTags } from "../utils/mockData";
 import { CheckCircle2, Clock, HelpCircle, Radio } from "lucide-react";
@@ -257,7 +258,7 @@ const Index = () => {
       return;
     }
     setTags((prev) => prev.filter((t) => t.id !== tagId));
-    setTasks((prev) => prev.map((t) => ({ ...t, tagIds: t.tagIds?.filter((id) => id !== tagId) || [] })));
+    setTasks((prev) => prev.map((t) => ({ ...t, tag_ids: t.tag_ids?.filter((id) => id !== tagId) || [] })));
     showSuccess("Tag deleted");
   };
 
@@ -270,8 +271,6 @@ const Index = () => {
         ...taskData,
         workspace_id: activeWorkspace.id,
         owner_id: session.user.id,
-        status: "todo",
-        priority: "medium",
       })
       .select()
       .single();
@@ -405,25 +404,10 @@ const Index = () => {
 
   if (!activeWorkspace) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4">
-        <div className="text-center max-w-md">
-          <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4">Create Your First Workspace</h2>
-          <p className="text-slate-600 dark:text-slate-400 mb-6">
-            Workspaces help you organize your tasks. Create a workspace to get started.
-          </p>
-          <NewTaskModal
-            users={users}
-            tags={tags}
-            workspaceId="temp"
-            onClose={() => {}}
-            onAddTask={(taskData) => {
-              handleAddTask(taskData);
-              setIsNewTaskOpen(false);
-            }}
-            accentColor={accentColor}
-          />
-        </div>
-      </div>
+      <FirstWorkspaceScreen
+        onCreateWorkspace={handleAddWorkspace}
+        accentColor={accentColor}
+      />
     );
   }
 
