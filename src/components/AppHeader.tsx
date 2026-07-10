@@ -88,7 +88,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         <img
           src={currentUser.avatar}
           alt={currentUser.name}
-          className="h-8 w-8 rounded-full object-cover border-2 border-slate-200 dark:border-slate-700 ml-1"
+          className="h-8 w-8 rounded-full object-cover border-2 border-slate-200 dark:border-slate-700"
           title={currentUser.name}
         />
         <Button

@@ -373,7 +373,7 @@ const Index = () => {
 
       setTasks((prev) => prev.map((t) => (t.id === taskId ? updatedTask : t)));
 
-      const statusLabels = { todo: "To Do", in_progress: "In Progress", review: "In Progress", done: "Done" };
+      const statusLabels = { todo: "To Do", in_progress: "In Progress", done: "Done" };
       const newActivity: Activity = {
         id: `act-${Date.now()}`,
         user_id: session?.user?.id,
@@ -385,6 +385,10 @@ const Index = () => {
       };
       await supabase.from("activities").insert(newActivity);
     }
+  };
+
+  const handleAvatarUpdate = (newAvatar: string) => {
+    setUsers((prev) => prev.map((u) => ({ ...u, avatar: newAvatar })));
   };
 
   if (loadingAuth) {
@@ -458,6 +462,7 @@ const Index = () => {
       onDeleteTag={handleDeleteTag}
       accentColor={accentColor}
       onAccentColorChange={setAccentColor}
+      currentUser={currentUser}
     />
   );
 

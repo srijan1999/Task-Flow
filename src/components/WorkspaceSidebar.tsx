@@ -9,10 +9,13 @@ import {
   Trash2,
   Palette,
   Moon,
+  User,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { AvatarUpload } from "./AvatarUpload";
 
 interface WorkspaceSidebarProps {
   workspaces: Workspace[];
@@ -26,6 +29,7 @@ interface WorkspaceSidebarProps {
   onDeleteTag: (tagId: string) => void;
   accentColor: AccentColor;
   onAccentColorChange: (color: AccentColor) => void;
+  currentUser?: { name: string; avatar: string };
 }
 
 const iconMap: Record<string, React.ComponentType<any>> = {
@@ -67,6 +71,7 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
   onDeleteTag,
   accentColor,
   onAccentColorChange,
+  currentUser,
 }) => {
   const [newWorkspaceName, setNewWorkspaceName] = useState("");
   const [newWorkspaceDesc, setNewWorkspaceDesc] = useState("");
@@ -92,8 +97,36 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
     setNewTagName("");
   };
 
+  const handleAvatarUpdate = (newAvatar: string) => {
+    // Avatar update is handled by the parent component
+  };
+
   return (
     <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-white dark:bg-slate-900 transition-colors duration-200">
+      {/* User Profile Section */}
+      {currentUser && (
+        <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800">
+          <Avatar className="h-12 w-12 border-2 border-slate-200 dark:border-slate-700">
+            <AvatarImage src={currentUser.avatar} alt={currentUser.name} />
+            <AvatarFallback>{currentUser.name.charAt(0).toUpperCase()}</AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-slate-800 dark:text-slate-100 truncate">
+              {currentUser.name}
+            </p>
+            <p className="text-xs text-slate-400 dark:text-slate-500">
+              {currentUser.role}
+            </p>
+          </div>
+          <AvatarUpload
+            currentAvatar={currentUser.avatar}
+            userName={currentUser.name}
+            onAvatarUpdate={handleAvatarUpdate}
+            accentColor={accentColor}
+          />
+        </div>
+      )}
+
       {/* Workspaces Section */}
       <div>
         <div className="flex items-center justify-between mb-3 px-1">
@@ -243,7 +276,7 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
               {tags.map((tag) => (
                 <div
                   key={tag.id}
-                  className={`flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-xl border ${
+                  className={`flex items-center gap-1.5 text-xs font-bold px-2.5 py-1.5 rounded-xl border ${
                     tagColorMap[tag.color] || "bg-slate-500/10 text-slate-600 border-slate-500/20"
                   }`}
                 >
