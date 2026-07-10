@@ -22,6 +22,7 @@ interface WorkspaceSidebarProps {
   activeWorkspace: Workspace | null;
   setActiveWorkspace: (workspace: Workspace) => void;
   onAddWorkspace: (name: string, description: string) => void;
+  onDeleteWorkspace: (workspaceId: string) => void;
   isDarkMode: boolean;
   onToggleDarkMode: () => void;
   tags: Tag[];
@@ -64,6 +65,7 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
   activeWorkspace,
   setActiveWorkspace,
   onAddWorkspace,
+  onDeleteWorkspace,
   isDarkMode,
   onToggleDarkMode,
   tags,
@@ -182,27 +184,37 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
             const IconComponent = iconMap[ws.icon] || Sparkles;
             const isActive = ws.id === activeWorkspace?.id;
             return (
-              <button
-                key={ws.id}
-                onClick={() => setActiveWorkspace(ws)}
-                className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-bold transition-all duration-200 ${
-                  isActive
-                    ? `${accent.bg} text-white shadow-md ${accent.shadow}`
-                    : "bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white border border-slate-100 dark:border-slate-800"
-                }`}
-              >
-                <IconComponent
-                  className={`h-4 w-4 ${isActive ? "text-white" : "text-slate-400 dark:text-slate-500"}`}
-                />
-                <div className="text-left min-w-0 flex-1">
-                  <p className="truncate leading-none">{ws.name}</p>
-                  {!isActive && ws.description && (
-                    <p className="text-[10px] text-slate-400 dark:text-slate-500 truncate mt-1 font-medium">
-                      {ws.description}
-                    </p>
-                  )}
-                </div>
-              </button>
+              <div key={ws.id} className="flex items-center justify-between">
+                <button
+                  onClick={() => setActiveWorkspace(ws)}
+                  className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-bold transition-all duration-200 ${
+                    isActive
+                      ? `${accent.bg} text-white shadow-md ${accent.shadow}`
+                      : "bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white border border-slate-100 dark:border-slate-800"
+                  }`}
+                >
+                  <IconComponent
+                    className={`h-4 w-4 ${isActive ? "text-white" : "text-slate-400 dark:text-slate-500"}`}
+                  />
+                  <div className="text-left min-w-0 flex-1">
+                    <p className="truncate leading-none">{ws.name}</p>
+                    {!isActive && ws.description && (
+                      <p className="text-[10px] text-slate-400 dark:text-slate-500 truncate mt-1 font-medium">
+                        {ws.description}
+                      </p>
+                    )}
+                  </div>
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation(); // prevent triggering the workspace select
+                    onDeleteWorkspace(ws.id);
+                  }}
+                  className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
+                >
+                  <Trash2 className="h-4 w-4 text-slate-500" />
+                </button>
+              </div>
             );
           })}
         </div>
