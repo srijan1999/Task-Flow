@@ -35,6 +35,12 @@ const Index = () => {
     const saved = localStorage.getItem("cotask_accent_color");
     return saved ? (saved as AccentColor) : "indigo";
   });
+  const [activeTab, setActiveTab] = useState<"board" | "activity">("board");
+  const [activeColumn, setActiveColumn] = useState<TaskStatus>("todo");
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [isNewTaskOpen, setIsNewTaskOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   const accent = accentColorMap[accentColor];
 
   // Swipe gesture handling for mobile sidebar
