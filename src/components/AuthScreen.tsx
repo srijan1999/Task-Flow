@@ -25,7 +25,6 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ accentColor, onAuthSucce
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const [role, setRole] = useState("Team Member");
   const [selectedAvatar, setSelectedAvatar] = useState(avatarOptions[0]);
   const [loading, setLoading] = useState(false);
 
@@ -49,7 +48,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ accentColor, onAuthSucce
           email,
           password,
           options: {
-            data: { name: name.trim(), avatar: selectedAvatar, role },
+            data: { name: name.trim(), avatar: selectedAvatar },
           },
         });
 
@@ -141,24 +140,9 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ accentColor, onAuthSucce
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Alex Rivera"
-                    className="pl-9 bg-slate-950 border-slate-800 text-white rounded-xl text-sm h-11 focus:ring-indigo-500"
+                    className={`pl-9 bg-slate-950 border-slate-800 text-white rounded-xl text-sm h-11 focus:ring-indigo-500`}
                   />
                 </div>
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Your Role</label>
-                <select
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  className="w-full text-sm font-bold bg-slate-950 text-slate-200 border border-slate-800 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                >
-                  <option value="Team Member">Team Member</option>
-                  <option value="Product Designer">Product Designer</option>
-                  <option value="Frontend Engineer">Frontend Engineer</option>
-                  <option value="Backend Lead">Backend Lead</option>
-                  <option value="Product Manager">Product Manager</option>
-                </select>
               </div>
 
               <div className="space-y-2">
@@ -194,7 +178,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ accentColor, onAuthSucce
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="alex@example.com"
-                className="pl-9 bg-slate-950 border-slate-800 text-white rounded-xl text-sm h-11 focus:ring-indigo-500"
+                className={`pl-9 bg-slate-950 border-slate-800 text-white rounded-xl text-sm h-11 focus:ring-indigo-500`}
               />
             </div>
           </div>
@@ -208,7 +192,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ accentColor, onAuthSucce
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="pl-9 bg-slate-950 border-slate-800 text-white rounded-xl text-sm h-11 focus:ring-indigo-500"
+                className={`pl-9 bg-slate-950 border-slate-800 text-white rounded-xl text-sm h-11 focus:ring-indigo-500`}
               />
             </div>
           </div>
