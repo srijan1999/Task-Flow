@@ -98,7 +98,7 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
     setNewTagName("");
   };
 
-  const handleAvatarUpdate = (newAvatar: string) => {
+  const handleAvatarUpdate = (_newAvatar: string) => {
     // Avatar update is handled by the parent component
   };
 
