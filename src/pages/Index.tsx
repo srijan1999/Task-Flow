@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { AppHeader } from "../components/AppHeader";
 import { WorkspaceSidebar } from "../components/WorkspaceSidebar";
 import { TaskCard } from "../components/TaskCard";
@@ -9,7 +9,7 @@ import { AuthScreen } from "../components/AuthScreen";
 import { FirstWorkspaceScreen } from "../components/FirstWorkspaceScreen";
 import { Task, User, Workspace, Activity, TaskStatus, Tag, AccentColor, accentColorMap } from "../types/task";
 import { mockUsers, mockWorkspaces, mockTasks, mockActivities, mockTags } from "../utils/mockData";
-import { CheckCircle2, Clock, HelpCircle, Radio } from "lucide-react";
+import { HelpCircle, Radio } from "lucide-react";
 import { Sheet, SheetContent } from "../components/ui/sheet";
 import { showSuccess, showError } from "../utils/toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -439,10 +439,10 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-200 font-sans flex flex-col">
+    <div className={`min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-200 font-sans flex flex-col ${isDarkMode ? "dark" : ""}`}>
       <div className="flex h-screen overflow-hidden flex-1">
         {/* Desktop Sidebar */}
-        <aside className="hidden lg:flex w-80 flex-col border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0">
+        <aside className="hidden lg:flex w-80 flex-col border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0 h-full overflow-hidden">
           {sidebarContent}
         </aside>
 
@@ -554,7 +554,7 @@ const Index = () => {
 
       {/* Mobile Sidebar Sheet */}
       <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-        <SheetContent side="left" className="w-80 p-0 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800">
+        <SheetContent side="left" className="w-80 p-0 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 h-full overflow-hidden">
           {sidebarContent}
         </SheetContent>
       </Sheet>

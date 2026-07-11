@@ -103,7 +103,7 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-white dark:bg-slate-900 transition-colors duration-200">
+    <div className="h-full overflow-y-auto p-6 space-y-6 bg-white dark:bg-slate-900 transition-colors duration-200 flex flex-col">
       {/* User Profile Section */}
       {currentUser && (
         <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800">
