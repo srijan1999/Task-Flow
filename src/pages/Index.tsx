@@ -16,10 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const [session, setSession] = useState<any>(null);
-  const [loadingAuth, setLoadingAuth] = useState<boolean>(() => {
-    const saved = localStorage.getItem("cotask_dark_mode");
-    return saved ? JSON.parse(saved) : false;
-  });
+  const [loadingAuth, setLoadingAuth] = useState<boolean>(true);
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [activeWorkspace, setActiveWorkspace] = useState<Workspace | null>(null);
   const [users, setUsers] = useState<User[]>([]);
@@ -42,6 +39,21 @@ const Index = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const accent = accentColorMap[accentColor];
+
+  // Sync dark mode with document element and localStorage
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+    localStorage.setItem("cotask_dark_mode", JSON.stringify(isDarkMode));
+  }, [isDarkMode]);
+
+  // Sync accent color with localStorage
+  useEffect(() => {
+    localStorage.setItem("cotask_accent_color", accentColor);
+  }, [accentColor]);
 
   // Auth state management
   useEffect(() => {
@@ -427,7 +439,7 @@ const Index = () => {
   }
 
   return (
-    <div className={`min-h-screen bg-slate-50 dark:bg-slate-950 ${isDarkMode ? "dark" : ""} transition-colors duration-200 font-sans flex flex-col`}>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-200 font-sans flex flex-col">
       <div className="flex h-screen overflow-hidden flex-1">
         {/* Desktop Sidebar */}
         <aside className="hidden lg:flex w-80 flex-col border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0">
@@ -500,17 +512,19 @@ const Index = () => {
                   })}
                 </div>
                 <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800">
-                  {activeColumnTasks.map((task) => (
-                    <TaskCard
-                      key={task.id}
-                      task={task}
-                      users={users}
-                      tags={tags}
-                      onClick={() => setSelectedTask(task)}
-                      onMoveStatus={handleMoveStatus}
-                      accentColor={accentColor}
-                    />
-                  ))}
+                  <div className="space-y-3">
+                    {activeColumnTasks.map((task) => (
+                      <TaskCard
+                        key={task.id}
+                        task={task}
+                        users={users}
+                        tags={tags}
+                        onClick={() => setSelectedTask(task)}
+                        onMoveStatus={handleMoveStatus}
+                        accentColor={accentColor}
+                      />
+                    ))}
+                  </div>
                   {activeColumnTasks.length === 0 && (
                     <div className="flex flex-col items-center justify-center py-20 text-center px-6 space-y-3">
                       <div className="bg-slate-100 dark:bg-slate-900 p-4 rounded-full text-slate-400 dark:text-slate-600">
