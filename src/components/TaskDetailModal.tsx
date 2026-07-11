@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { X, Tag as TagIcon, CheckSquare, MessageSquare, Trash2, Send } from "lucide-react";
-import { Task, User, Comment, SubTask, AccentColor, accentColorMap } from "../types/task";
+import { Task, User, Comment, SubTask, Tag, AccentColor, accentColorMap } from "../types/task";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
