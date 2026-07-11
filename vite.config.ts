@@ -4,7 +4,8 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
 export default defineConfig(() => ({
-  base: "/Task-Flow/",
+  // Use subfolder base only when building on GitHub Actions, otherwise default to root "/" for Vercel/local
+  base: process.env.GITHUB_ACTIONS ? "/Task-Flow/" : "/",
   server: {
     host: "::",
     port: 8080,
