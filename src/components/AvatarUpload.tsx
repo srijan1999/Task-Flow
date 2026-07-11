@@ -1,12 +1,10 @@
-"use client";
-
 import React, { useState, useRef, useEffect } from "react";
 import { Camera, X } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { supabase } from "@/integrations/supabase/client";
-import { showSuccess, showError } from "@/utils/toast";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Button } from "./ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
+import { supabase } from "../integrations/supabase/client";
+import { showSuccess, showError } from "../utils/toast";
 
 interface AvatarUploadProps {
   currentAvatar: string;
